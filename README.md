@@ -9,7 +9,7 @@ ShadowWork-SHIFT is an experimental pipeline for **LEXSI.ai's AI Safety & Alignm
 
 The pipeline detects and diagnoses failing runs, uses learner-visited states and verified corrective continuations for LoRA adaptation, evaluates policies against matched rehearsal controls, and gates recovery changes on strictly checked persisted state and task evidence. **AgentTune** is used for agent execution and tool harnesses, with **AuditKIT** for evaluation and diagnostics. LoRA optimization uses **TRL/PEFT**, not a claim that AgentTune natively performed those weight updates.
 
-> **Status:** Experimental research prototype, *not production certified*. Model and dataset Hub repositories are provisioned; large weights and complete episode archives require publication and public-access verification before the hackathon submission is complete.
+> **Status:** Experimental research prototype, *not production certified*. The exact custom Plain SFT base and three SW08/SW09 adapters, SW09 training traces, and 70-case holdout evidence were published previously; SW12 corrective/rehearsal v3 adapters and SW12–SW16 evidence are in the publication pipeline and must be verified before submission.
 
 ## Results at a glance
 
@@ -80,7 +80,7 @@ Simulated workflow + fault scenario
 ## Reproduce
 
 1. Use a Kaggle GPU notebook environment with **two T4 GPUs** for the original training configuration.
-2. Supply the exact custom Plain SFT base checkpoint plus parent adapter specified in [Artifact manifest](docs/ARTIFACTS.md). These checkpoint paths were Kaggle inputs in the reported experiments. Public Hugging Face upload of the custom base and adapters is a separate release task.
+2. Obtain the [exact publicly released custom Plain SFT checkpoint](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft) and [Oracle BC v2 adapter](https://huggingface.co/i-am-shaurya05/shadowwork-shift-oracle-bc-v2), or use the original Kaggle-mounted paths from the notebooks. SW12 v3 weights still require their own final upload.
 3. Run the numbered notebooks in [notebooks/](notebooks/) only when all exact inputs are attached. They preserve the original experiment protocols and are **not** a promise of plug-and-play inference with an unrelated base model.
 4. Evaluate the resulting policies with the archived task specifications and scoring definitions; report **strict** success separately from final DB-state correctness and evidence support.
 5. Inspect [Results](results/README.md) for cohort-specific summary CSVs and named source archives. **Do not add success counts across different controllers or reused task sets.**
@@ -89,10 +89,15 @@ See [Reproduction guide](docs/REPRODUCIBILITY.md) for dependencies, frozen check
 
 ## Publications
 
-- [Hugging Face model repository](https://huggingface.co/i-am-shaurya05/shadowwork-shift-models)
-- [Hugging Face dataset repository](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets)
+- [Model collection (existing)](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac)
+- [Dataset/evidence collection (existing)](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812)
+- [Exact published custom Plain SFT base](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft)
+- [Original corrective adapter](https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective) and [matched SW09 rehearsal adapter](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-bc)
+- [Original SW09 training data and audited holdout traces](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training)
+- [SW12 corrective v3 repository (empty until upload)](https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v3) and [SW12 rehearsal v3 repository (empty until upload)](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v3)
+- [SW12–SW16 evidence repository (pending upload)](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets)
 
-**Important:** These repository links exist, but availability of all model weights and complete datasets must be verified separately. Public HF **collections** (not merely repos) are also required by the hackathon and are tracked in [Submission checklist](SUBMISSION_CHECKLIST.md).
+**Important:** Both public collections existed before this GitHub release; the v3 models and latest datasets are not yet populated. Follow the [Kaggle publishing notebook](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb) and independently verify public collection membership and read access before submitting.
 
 ## Main limitations
 
@@ -101,7 +106,7 @@ See [Reproduction guide](docs/REPRODUCIBILITY.md) for dependencies, frozen check
 - SW12 rehearsal v3 equals or outperforms corrective v3 on important cohorts.
 - Controller improvements and learned improvements cannot be pooled into one causal estimate.
 - No unrestricted deployment or guarantees beyond the tested authorization and mutation semantics.
-- Some final weights are Kaggle-hosted and require separate Hugging Face publication.
+- Both SW12 v3 adapter weights remain Kaggle-hosted until their public Hugging Face releases are completed.
 
 ## Repository navigation
 
@@ -109,6 +114,8 @@ See [Reproduction guide](docs/REPRODUCIBILITY.md) for dependencies, frozen check
 - [Reproducibility](docs/REPRODUCIBILITY.md): environment, source lineage and practical steps.
 - [Artifact manifest](docs/ARTIFACTS.md): original experiment ZIPs, weights, seeds and provenance.
 - [Results](results/README.md): compact verified result tables.
+- [Offline verification script](scripts/verify_archived_results.py): recompute exact counts from source archives.
+- [Hugging Face publishing notebook](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb): publish two SW12 v3 adapters and latest evaluation evidence.
 - [Submission checklist](SUBMISSION_CHECKLIST.md): final public-link and form gate.
 
 **Acknowledgment:** Built for the [LEXSI AI Safety & Alignment Hackathon](https://hackathon.lexsi.ai/) using the Cohere open-weight model ecosystem, AgentTune, AuditKIT, TRL, PEFT, and the Hugging Face Hub. No claim is made that the two LEXSI libraries by themselves perform the LoRA optimization.
