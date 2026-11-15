@@ -8,7 +8,7 @@ Original runs used Kaggle **2 × NVIDIA T4**. The SW09 extracted-input notebook 
 
 ## Training order
 
-1. **Base**: Load the custom Plain SFT checkpoint from `/kaggle/input/datasets/shaurya466/shift-plain/shadowork_123`. Verify the seven shard hashes recorded in SW09 `base_hashes.json` where applicable.
+1. **Base**: Load the [already-published exact custom Plain SFT checkpoint](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft) or the original Kaggle path `/kaggle/input/datasets/shaurya466/shift-plain/shadowork_123`. The seven public shard-hash commitments match SW09 `base_hashes.json`.
 2. **SW08 Oracle BC v2**: Use the adapter from `ShadowWork_09_Kaggle_Input_Bundle.zip`. It is the parent for SW09 adaptation, not a standalone base model.
 3. **SW09 original learner-state corrective**: Run `ShadowWork_09_Kaggle_Extracted_Input_Ready.ipynb` using the prepared inputs and v2 adapter in the same Kaggle input bundle. The notebook collects 140 train-only workflows, creates matched training rows and runs the corrective and on-policy comparator arms. Keep the separate final 70-case holdout detached.
 4. **SW09 sealed holdout**: Use `ShadowWork_09_Final_Holdout_Extracted_Kaggle_Ready.ipynb`; verify split commitment before evaluation.
@@ -25,7 +25,7 @@ Original runs used Kaggle **2 × NVIDIA T4**. The SW09 extracted-input notebook 
 
 ## End-to-end vs partial reproduction
 
-A source archive replay and metric aggregation can run without GPU once the scored episode logs have been downloaded. Full model inference/training requires the custom full-precision base checkpoint, correct adapter, original tokenizer/chat template, fixed seeds and environment. The release is incomplete until the custom base checkpoint and all indicated adapters are uploaded and publicly tested.
+A source archive replay and metric aggregation can run without GPU once the scored episode logs have been downloaded. See [the offline verification script](../scripts/verify_archived_results.py). Full model inference/training requires the custom full-precision base checkpoint, correct adapter, original tokenizer/chat template, fixed seeds and environment. The custom full Plain SFT base and SW08/SW09 adapters are already public. The release remains incomplete until the two SW12 v3 adapters and latest evaluation evidence are uploaded and checked for public accessibility. Use [this Kaggle publication notebook](../notebooks/FINAL_HF_Publish_From_Kaggle.ipynb).
 
 ## LEXSI component provenance
 
