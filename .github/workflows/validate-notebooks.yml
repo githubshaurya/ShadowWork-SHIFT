@@ -1,0 +1,38 @@
+name: Validate research notebooks
+
+on:
+  push:
+    paths:
+      - "notebooks/**"
+      - ".github/workflows/validate-notebooks.yml"
+  workflow_dispatch:
+
+jobs:
+  notebook-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check notebook JSON and cell Python syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import ast
+          import json
+
+          checked = 0
+          for path in sorted(Path("notebooks").glob("*.ipynb")):
+              notebook = json.loads(path.read_text())
+              assert notebook["nbformat"] == 4, path
+              for index, cell in enumerate(notebook["cells"]):
+                  if cell["cell_type"] != "code":
+                      continue
+                  source = "".join(cell["source"])
+                  if source.lstrip().startswith("%pip "):
+                      continue
+                  ast.parse(source, filename=f"{path}:cell-{index}")
+                  checked += 1
+          print(f"Validated {checked} code cells.")
+          PY
