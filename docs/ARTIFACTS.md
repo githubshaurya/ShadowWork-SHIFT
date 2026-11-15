@@ -1,0 +1,59 @@
+# Artifact inventory and provenance
+
+This inventory separates **source notebooks**, **trained weights**, **training/benchmark datasets**, and **evidence archives**. A ZIP being present in Project/Kaggle is *not* proof that it is already publicly downloadable.
+
+## Checkpoint lineage
+
+```
+Cohere Tiny Aya-derived custom Plain SFT (~3.35B, full checkpoint)
+  (Kaggle input: shaurya466/shift-plain/shadowork_123)
+  |
+  +--> Oracle BC v2 LoRA
+          |
+          +--> SW09 learner-state corrective LoRA (original corrective)
+                  |
+                  +--> SW12 learner-corrective v3 LoRA
+                  |
+                  +--> SW12 matched rehearsal v3 LoRA
+          |
+          +--> SW09 on-policy/rehearsal BC comparator
+```
+
+**Caution:** All LoRA `adapter_config.json` files currently reference a **local Kaggle** `base_model_name_or_path`. A release pipeline must rewrite those paths *after* the exact custom base is made public, and verify tokenizer/template compatibility. Do not silently swap in a generic upstream Tiny Aya weight set.
+
+## Primary archived sources
+
+| Artifact | Contents | Status |
+|---|---|---|
+| `ShadowWork_09_Kaggle_Input_Bundle.zip` | SW08 Oracle BC v2 adapter, prepared train-only source ZIP | Available in Project and on Kaggle; publication pending |
+| `ShadowWork_09_Learner_State_Verified_Recovery_Kaggle.ipynb` | Original embedded-data SW09 pipeline | Available source |
+| `ShadowWork_09_Kaggle_Extracted_Input_Ready.ipynb` | Final extracted-input SW09 training pipeline | Preferred runnable source |
+| `ShadowWork_09_learner_corrective_Adapter.zip` | SW09 original corrective LoRA weights and tokenizer | Available in Project; HF upload pending |
+| `ShadowWork_09_rehearsal_bc_Adapter.zip` | SW09 matched comparator | Available in Project; HF upload pending |
+| `ShadowWork_09_Final_Holdout_Evidence.zip` | 210 scored episodes + split commitments | Available in Project; HF upload pending |
+| `ShadowWork_12_Closed_Loop_Evidence.zip` | v3 corrective and rehearsal adapters, training rows, task splits, episode scores, manifests | Available in Project; HF upload pending |
+| `ShadowWork_13_Live_Results.zip` | Initial live controller evidence, scorecards, traces | Available in Project |
+| `ShadowWork_14_Controller_Repair_Results1.zip` | Fresh 128-task paired controller experiment | Available in Project |
+| `ShadowWork_15_Cross_Protocol_Recovery_Results.zip` | 70 SW09 + 80 SW12 new tasks and controller comparisons | Available in Project |
+| `ShadowWork_16_Unified_Recovery_Results.zip` | 1,096 evaluated episodes, SW09 retention + SW12 core/composed, deployment gate | Available in Project |
+| `ShadowWork_16_Budget_Regression_Results.zip` | 320 v5 episodes, paired_summary.csv, paired_task_results.csv, gate | Available in Project |
+
+Preferred rendered notebook names in GitHub should use descriptive `SW09_...`, `SW12_...` rather than the generic Kaggle download filename `notebook12903defcf*.ipynb`.
+
+## Prespecified identity and split checks
+
+- SW09 final holdout: 70 cases in seven 10-case failure groups; `holdout_sha256=1e13aa4d951ae1acdcc5d8ec9bdd43a3ec7e0897a0254aeff037e33ba9866197` as recorded in `holdout_commitment.json`.
+- SW12 source generator: seed `20261113`, max 22 actions; train/dev/sealed split hashes in `final_provenance.json`.
+- SW12 starting adapter digest: `680659a3c6fce48e18f4ce8087b3fbb2c5806d4427e90c2b5cc6c49a524bb441`; v3 training source hashes in per-arm `*_training_metadata.json`.
+- SW12 v3: 800 training rows per matched arm, 80 optimizer steps, LR `5e-5`, global batch 8.
+
+## Public Hub targets
+
+- Model repo: https://huggingface.co/i-am-shaurya05/shadowwork-shift-models
+- Dataset repo: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
+
+These two public repos have been created, but **repo creation alone does not satisfy the required public model/data publication**. Confirm actual files, weights, data cards and HF **collections** before submission.
+
+## Integrity conventions
+
+Retain the original evidence ZIPs in a `source_archives/` staging directory until checked; keep ZIP member names and SHA-256 checksums. Publish only curated, relevant artifacts, not redundant generated copies of identical tasks. Recompute metrics from exported episode JSONs and scorecards. No hand-entered data should replace raw traces for scientific verification.
