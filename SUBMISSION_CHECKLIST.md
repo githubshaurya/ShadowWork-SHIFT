@@ -7,14 +7,20 @@
 
 - [x] Public GitHub repository: https://github.com/githubshaurya/ShadowWork-SHIFT
 - [x] Written report and reproducibility guidance in the repository.
-- [x] Hugging Face model **repository created**: https://huggingface.co/i-am-shaurya05/shadowwork-shift-models
-- [x] Hugging Face dataset **repository created**: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
-- [ ] All adapter weights, tokenizer/config files and base checkpoint public, correctly licensed, loadable and ungated.
-- [ ] All relevant dataset/evaluation/run evidence published and accessible ungated.
-- [ ] Public **Hugging Face model collection** created, populated, verified, and its URL recorded.
-- [ ] Public **Hugging Face dataset collection** created, populated, verified, and its URL recorded.
+- [x] Exact Plain SFT base published with verified 7-shard hash metadata: https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft
+- [x] SW08 and SW09 original adapters published: https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective
+- [x] SW09 original training and holdout evidence published: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training
+- [x] Existing Hugging Face model **collection located**: https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac
+- [x] Existing Hugging Face dataset **collection located**: https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812
+- [x] New public repository shells created for the two SW12 v3 adapters and SW12–SW16 evidence.
+- [ ] Upload SW12 corrective v3 and rehearsal v3 complete adapters using [the Kaggle publisher](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb).
+- [ ] Upload SW12–SW16 training/evaluation evidence (source ZIPs optionally in the curated bundle).
+- [ ] Add new repos to the existing model and dataset collections; verify resulting membership.
+- [ ] All released model/dataset files verified publicly downloadable and ungated.
+- [ ] Verify collection URLs in an ordinary browser (collection metadata visible but file-browser collection read returned an access error).
 - [ ] Public-link access verified without user login.
-- [ ] All notebook files uploaded into GitHub; exact input dependencies described.
+- [x] Core SW09/SW12/SW14/SW15/SW16 notebooks and SW16 budget repair notebook uploaded to GitHub.
+- [x] Offline result verification script added; source-archive ZIPs must be supplied by the user when running it.
 - [ ] Optional: independent small replay/smoke test using the public model/adapter path.
 
 ## Required form fields
