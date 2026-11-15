@@ -19,7 +19,7 @@ Cohere Tiny Aya-derived custom Plain SFT (~3.35B, full checkpoint)
           +--> SW09 on-policy/rehearsal BC comparator
 ```
 
-**Caution:** All LoRA `adapter_config.json` files currently reference a **local Kaggle** `base_model_name_or_path`. A release pipeline must rewrite those paths *after* the exact custom base is made public, and verify tokenizer/template compatibility. Do not silently swap in a generic upstream Tiny Aya weight set.
+**Caution:** Original archive configs reference **local Kaggle** base paths. The publicly released SW08/SW09 adapter configs now point to the exact already-public custom base; SW12 v3 configs must be rewritten *as metadata only* during their pending release. Verify tokenizers and original weight hashes. Do not silently substitute a generic Tiny Aya base.
 
 ## Primary archived sources
 
@@ -47,12 +47,26 @@ Preferred rendered notebook names in GitHub should use descriptive `SW09_...`, `
 - SW12 starting adapter digest: `680659a3c6fce48e18f4ce8087b3fbb2c5806d4427e90c2b5cc6c49a524bb441`; v3 training source hashes in per-arm `*_training_metadata.json`.
 - SW12 v3: 800 training rows per matched arm, 80 optimizer steps, LR `5e-5`, global batch 8.
 
-## Public Hub targets
+## Verified existing public artifacts and pending new uploads
 
-- Model repo: https://huggingface.co/i-am-shaurya05/shadowwork-shift-models
-- Dataset repo: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
+**Previously published on November 12, 2026:**
 
-These two public repos have been created, but **repo creation alone does not satisfy the required public model/data publication**. Confirm actual files, weights, data cards and HF **collections** before submission.
+- Exact full seven-shard Plain SFT base: https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft
+- Oracle BC v2 parent adapter: https://huggingface.co/i-am-shaurya05/shadowwork-shift-oracle-bc-v2
+- Original SW09 learner-state corrective: https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective
+- Original SW09 matched rehearsal adapter: https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-bc
+- SW09 original training/holdout data, audit reports and simulator code: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training
+- Previously created model collection: https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac
+- Previously created data collection: https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812
+
+**Created Nov 15, pending model/data upload and final public verification:**
+
+- SW12 corrective v3 adapter: https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v3
+- SW12 rehearsal v3 adapter: https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v3
+- SW12–SW16 dataset and audited evidence: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
+- Publishing source: [FINAL_HF_Publish_From_Kaggle.ipynb](../notebooks/FINAL_HF_Publish_From_Kaggle.ipynb)
+
+The seven base weight-shard hashes publicly documented in `provenance/base_checkpoint_shards_sha256.json` match the seven hashes independently present in SW09 final holdout `base_hashes.json`. Existing public collections are visible in account metadata; their browser access and final membership should still be verified independently.
 
 ## Integrity conventions
 
