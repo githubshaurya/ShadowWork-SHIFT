@@ -42,7 +42,7 @@ license: cc-by-nc-4.0
 | `sw12/evaluation/` | Held-out action traces, tool observations and outcomes |
 | `sw12/selection_audit.json`, `precommit.json` | Label-selection details and split identities |
 | `sw12/*_training_metadata.json` | Model-init provenance and optimization settings |
-| `sw17/` | Optional finalized v4 training/evaluation records when uploaded |
+| `sw17/` | Published v4 training JSONLs, frozen splits, 160 train-only learner rollouts, 320 sealed evaluations, scores, paired tests and training metadata |
 | `sha256_release_manifest.json` | Released-file checksums |
 
 The original SW09 training and 70-task holdout evidence are published separately at [SW09 dataset](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training).
