@@ -22,7 +22,7 @@ ShadowWork-SHIFT closes the loop between **failure discovery, recovery-data crea
 | **Actual LEXSI SDKs** | AgentTune `Project`, `ReActStrategy`, `DictToolHarness`; AuditKIT `AgentEvalRunner`, `AgentCase`, `FinalStateAssertion` |
 | **Open release** | Exact custom base, four v3/v4 trained adapters, synthetic training JSONLs, precommitted splits, **160 SW12 + 160 SW17 learner rollouts**, **384 SW12 + 320 SW17 evaluated trajectories**, method and SHA-256 provenance on Hugging Face |
 
-Our release matches the hackathon's central technical deliverables: **a dense Cohere-derived open-weights model, practical Track 3 tool-agent workflow, LEXSI SDK integration, public model/data artifacts, more than one before/after metric, and a reproducible write-up**. The participant must still complete the official submission form.
+Our release matches the hackathon's central technical deliverables: **a dense Cohere-derived open-weights model, practical Track 3 tool-agent workflow, LEXSI SDK integration, public model/data artifacts, more than one before/after metric, and a reproducible write-up**. The official first-round form submission was confirmed received; the public artifacts and reproducibility links above are the judging entry points.
 
 ## 1. The problem: an acknowledgment is not a verified outcome
 
