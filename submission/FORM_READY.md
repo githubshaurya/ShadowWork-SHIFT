@@ -8,7 +8,7 @@
 
 **Registered email:** Enter the email associated with the hackathon registration. Do not substitute a model-account email unless it is the registered one.
 
-**Abstract (under 500 words):** Copy the current [submission/ABSTRACT.md](ABSTRACT.md) text, excluding its markdown title if the form has a separate title field. It is **384 words including links** as of November 16.
+**Abstract (under 500 words):** Copy the current [submission/ABSTRACT.md](ABSTRACT.md) text, excluding its markdown title if the form has a separate title field. The abstract is **under 500 words**. Use the version preserved in `ABSTRACT.md`.
 
 **Hugging Face model collection:** https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac
 
@@ -26,7 +26,7 @@
 
 **Safety statement:** The simulator prevents executed unauthorized state mutations; the SW17 evaluation detects eight forbidden-action proposals per v4 arm, so the policy deployment gate remains HOLD. This is the result of a measured, transparent safety decision. Training gain and policy-level authorization reliability are reported separately.
 
-**Public verification:** [Release audit](../docs/PUBLIC_RELEASE_VERIFICATION.md) records an actual completed unauthenticated Hub API gate and exact published collection contents. Do not hold submission for an unnecessary historical evidence addendum.
+**Public verification:** [Release audit](../docs/PUBLIC_RELEASE_VERIFICATION.md) records an actual completed unauthenticated Hub API gate and exact published collection contents. The subsequently published [SW13–SW16 historical evidence](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets/tree/main/historical) is accessible separately from the core SW12/SW17 cohorts.
 
 ## Submission status: received
 
