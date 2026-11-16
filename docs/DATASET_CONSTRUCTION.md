@@ -28,7 +28,7 @@ The original SW09 data and 70-task final holdout are already in the public [SW09
 
 SW12 groups are `normal`, `double_conflict`, `double_noop`, `wrong_then_stale`, `two_stale`, `false_positive`, `injected_forbidden`, and `injected_authorized`. SW17 adds `approval_not_required` and `lease_expired`. Both model protocol variants within every group. Fault behavior is implemented by an executable `RecoveryEnvironment` that stores persisted configuration values in SQLite and returns tool results that can differ from durable state.
 
-SW17 further changes service names, region names, request phrasing, and includes three previously unseen configuration fields in part of the sealed test cohort. This is **shift within a related synthetic workflow family**, not generalization to independently authored real production systems.
+SW17 further changes service names, region names, request phrasing, and includes three previously unseen configuration fields in part of the sealed test cohort. This is **shift within a related synthetic workflow family**, not generalization to independently authored real production systems. The [executed and audited SW17 data-construction account](DATASET_METHOD.md#executed-sw17-dataset-construction-and-quantitative-audit) records **160 train-only rollouts → 1,311 learner states → 859 mismatch candidates → 400 selected learner-state rows (211 actual action corrections)**, 395/400 exact matched-control strata, a concrete recorded example, and immutable source hashes.
 
 ## 3. Generation pipeline
 
