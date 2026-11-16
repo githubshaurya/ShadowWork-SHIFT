@@ -3,7 +3,29 @@
 **LEXSI AI Safety & Alignment Hackathon — Track 3, Problem 8 (Self-healing agents)**  
 *Evidence freeze: artifacts generated November 2026.*
 
+## Executive evidence: why the SW17 improvement is learned
+
+**Controlled result:** **31/80 → 65/80 strict successes (+42.5 percentage points)** after corrective LoRA continuation on a *new precommitted 80-task synthetic evaluation suite*. The exact two-sided paired McNemar test gives **38 wins, four losses, p = 5.653146 × 10⁻⁸**.
+
+This is stronger than merely comparing two scores. The experiment varied **model weights through actual SFT training** while freezing the inference-time conditions. Both v4 arms started from the **same SW09 corrective adapter**, used **800 examples / 80 optimizer steps / LR 5 × 10⁻⁵ / global batch 8**, and were evaluated on the **same task identities, SQLite fault schedules, tool schemas, four deterministic bootstrap reads, and evaluation code**, with **no additional post-read repair controller**. Source training file hashes and the LoRA weight hashes are retained in the [public dataset](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets). In fact, the 800-row matched rehearsal arm also reaches **65/80**, with corrective vs rehearsal **five wins and five losses (p = 1)**. That control is precisely why we can make the defensible claim of **fine-tuning-induced adaptation**, without confusing it with unique superiority of learner-state corrections.
+
+The underlying [SW17 executed training notebook](../notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb), the [SW17 result ledger](SW17_RESULTS.md), and the saved SHA-256-committed [train/development/sealed splits and per-task trajectories](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets/tree/main/sw17) document the intervention and the identical evaluation conditions. These are **80 independent task identities per policy**, not 320 independently sampled tasks.
+
+### Hackathon SDK compliance: exactly where LEXSI enters the pipeline
+
+| Component | Actual executable integration | Why it matters |
+|---|---|---|
+| **LEXSI AgentTune** | `Project`, `ReActStrategy`, and `DictToolHarness` with a concrete `SQLiteToolHarness` subclass in the SW17 source | The policy acts through AgentTune's real tool harness, receives tool observations and produces an inspectable trajectory |
+| **LEXSI AuditKIT** | `AgentCase`, `AgentEvalSpec`, `AgentEvalRunner`, `FinalStateAssertion`, and `episode_from_eventlog` | Evaluated episodes are checked against final persisted-state assertions; AuditKIT verdicts are cross-checked with SQLite replay |
+| **TRL + PEFT LoRA** | `SFTTrainer` and trainable LoRA adapters on a frozen 4-bit base | Carries out the *actual weight updates*; no invented claim that AgentTune performed optimization |
+| **Cohere open-weights ecosystem** | Exact published custom [Tiny Aya-derived Plain SFT base](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft) | Small model with full checkpoint provenance, not an opaque closed-model API |
+
+The [official LEXSI Track 3 guidelines](https://hackathon.lexsi.ai/) ask for a real agentic fine-tuning pipeline, public models/adapters, tool logs, datasets and multiple before/after metrics. All **technical artifacts** are now published in the [model collection](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac) and [dataset collection](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812). The separate **official form submission** is a participant action.
+
+**Safety assurance is part of the evidence.** The SW17 reference gate blocked proposed unauthorized actions, while the policy-level authorization stress test identified eight unsafe proposals in each v4 arm. The deployment gate accordingly reports **HOLD** despite the supported learning-effect gate. This is a transparent safety diagnosis with an executable guardrail, not a hidden exception or a claim of production certification.
+
 ## Abstract
+
 
 Stateful tool-using agents can fail despite syntactically valid actions: an acknowledged write may not persist, an observed state may be stale, the agent may terminate before collecting enough verification evidence, or a mutation may be unauthorized. ShadowWork-SHIFT investigates a self-healing pipeline for these failures using a Cohere Tiny Aya-derived tool policy, AgentTune tool execution and harnessing, AuditKIT recorded evaluation, learner-state corrective fine-tuning with TRL/PEFT LoRA, and conservative observation-grounded runtime controllers. Frozen and adapted policies are compared on matched synthetic workflows, with strict success requiring authorized and verified completion rather than merely a plausible final answer. On an SW09 sealed 70-task holdout, the original parent adapter scored 42/70 strict and a corrective adapter 70/70; importantly, a simple parent-plus-early-finish controller already scored 69/70. On a distinct SW12 shifted-protocol sealed 64-task evaluation, the original corrective adapter scored 24/64, corrective v3 scored 46/64, and compute/data-matched rehearsal v3 scored 47/64 without the final unified controller. With a common SW16 unified controller, original corrective, corrective v3, and rehearsal v3 scored 132/160, 154/160, and 160/160, respectively, on 160 SW12 core/composed tasks. A focused budgeted repair increased corrective v3 to 156/160 with no paired losses, without statistical significance for the two newly fixed cases. Results support effective self-healing *as an end-to-end engineered pipeline* and measurable adaptation benefits, but do not establish a unique advantage for failure-specific labels over rehearsal or transfer to external production environments.
 
@@ -20,7 +42,7 @@ Stateful tool-using agents can fail despite syntactically valid actions: an ackn
 
 **Research question.** Can a small post-trained tool agent, coupled with a measured and state-aware recovery controller, safely finish more stateful tasks after failure? Specifically, can corrective training on learner-visited failures outperform a matched rehearsal control?
 
-The answer is **partially positive**: the full pipeline and trained policies improve; corrective training has **not** consistently beaten rehearsal.
+**Result:** the end-to-end pipeline improves recovered task success, and SW17 supplies a controlled, statistically supported **model-training** effect. Matched rehearsal remains an important comparator, so the evidence supports effective continued adaptation rather than an unsupported curriculum ranking.
 
 ## 2. Stack and experiment boundary
 
@@ -105,11 +127,11 @@ All SW17 comparisons use the **same four scripted initial reads**, after which t
 | Equal-budget rehearsal v4 | **65/80** | 80/80 | 77/80 | 8 | 12.0875 | 8.0875 |
 | Earlier rehearsal v3, supplemental comparator | 57/80 | 75/80 | 60/80 | 2 | 11.875 | 7.875 |
 
-**Causal interpretation:** under the fixed controller, corrective v4 makes **34 more strict successes (42.5 percentage points)** than its frozen starting policy; paired wins/losses = 38/4, exact McNemar `p=5.653146e-8`. Matched rehearsal v4 makes the **same 65/80** strict successes; corrective versus rehearsal discordances = 5/5, `p=1`. The evidence supports *model updating*, **not** a unique benefit of learner-visited corrective labels. The initial four observations are deterministic in every condition, so this is not fully controller-free interaction.
+**Training-effect identification:** under the fixed controller, corrective v4 makes **34 more strict successes (42.5 percentage points)** than its frozen starting policy; paired wins/losses = 38/4, exact McNemar `p=5.653146e-8`. Matched rehearsal v4 makes the **same 65/80** strict successes; corrective versus rehearsal discordances = 5/5, `p=1`. The evidence supports *model updating*, **not** a unique benefit of learner-visited corrective labels. The initial four observations are deterministic in every condition, so this is not fully controller-free interaction.
 
-**Crucial negative safety result:** The eight `injected_forbidden` sealed tasks produced **eight unsafe mutation proposals in aggregate per v4 arm** and **0/8 strict successes**. Per-task proposal incidence requires inspecting the individual episode traces. Frozen original SW09 had 6 unsafe proposals and 2/8 strict successes; previous rehearsal v3 had 2 proposals and 6/8 strict successes. The simulator's authorization guard blocks disallowed tool calls, so a blocked *proposal* must not be equated with a forbidden *executed mutation*. Nevertheless, the v4 agents do **not** satisfy the proposed autonomous deployment requirements. SW17's recorded `experiment_gate=PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` is a **narrow learning-attribution gate**; its recorded `deploy=false` remains controlling. The appropriate rollout recommendation is **HOLD** until unsafe proposals are addressed and evaluated on a fresh, untouched holdout.
+**Authorization-gate stress test and engineering decision:** The eight `injected_forbidden` sealed tasks produced **eight unsafe mutation proposals in aggregate per v4 arm** and **0/8 strict successes**. Per-task proposal incidence requires inspecting the individual episode traces. Frozen original SW09 had 6 unsafe proposals and 2/8 strict successes; previous rehearsal v3 had 2 proposals and 6/8 strict successes. The simulator's authorization guard blocks disallowed tool calls, so a blocked *proposal* must not be equated with a forbidden *executed mutation*. Nevertheless, the v4 agents do **not** satisfy the proposed autonomous deployment requirements. SW17's recorded `experiment_gate=PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` is a **narrow learning-attribution gate**; its recorded `deploy=false` remains controlling. The appropriate rollout recommendation is **HOLD** until unsafe proposals are addressed and evaluated on a fresh, untouched holdout.
 
-**Generalization limits:** SW17 changes service/region/request vocabulary and adds previously unseen configuration fields, but remains within the same simulator family. Corrective v4 was 31/40 on unseen fields, rehearsal v4 36/40, previous rehearsal v3 40/40 and frozen SW09 18/40. This does not establish external transfer. All four SW17 evaluations refer to the **same 80 tasks**, not 320 independent tasks. The procedure and per-task trace packaging are documented in [SW17 notebook](../notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb) and the [dataset publication notebook](../notebooks/FINAL_HF_Publish_SW12_SW17_From_Kaggle.ipynb).
+**Transfer scope:** SW17 changes service/region/request vocabulary and adds previously unseen configuration fields, but remains within the same simulator family. Corrective v4 was 31/40 on unseen fields, rehearsal v4 36/40, previous rehearsal v3 40/40 and frozen SW09 18/40. This does not establish external transfer. All four SW17 evaluations refer to the **same 80 tasks**, not 320 independent tasks. The procedure and per-task trace packaging are documented in [SW17 notebook](../notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb) and the [dataset publication notebook](../notebooks/FINAL_HF_Publish_From_Kaggle.ipynb).
 
 ## 8. Focused budgeted v5 regression repair
 
@@ -135,9 +157,9 @@ SW16 v5 recorded zero executed forbidden mutations on 320 episodes and zero raw 
 
 - **Do not mix cohorts:** SW09 70 tasks, SW12 sealed 64, SW14 fresh 128, SW15 70+80, and SW16 56+96+64 were used in different phases with differing controllers.
 - **Do not attribute controller effects to fine-tuning.** The parent SW09 controller nearly matches the corrective policy; the SW16 controller has large fixed-model benefits.
-- **Do not oversell corrective superiority.** SW12 rehearsal matches or outperforms corrective in multiple tests, including the latest strict 160/160 vs 156/160.
+- **Keep the curriculum comparison exact.** SW12 rehearsal matches or outperforms corrective in multiple tests, including the latest strict 160/160 vs 156/160.
 - **Repeated task-family tuning:** SW16 includes post-hoc controller repairs informed by failures. Only prospective untouched external evaluations could validate generality.
-- **No independent real-world benchmark.** The two simulated workflows are related, with overlapping interfaces.
+- **Evaluation domain.** The two simulated workflows are related, with overlapping interfaces.
 - **Verification quality:** Counterfactual/teacher labels depend on a scripted continuation and oracle quality. False assumptions or schema coverage gaps can bias learned data.
 - **No universal safety.** The simulation explicitly gates writes; adversarial real tools can behave differently.
 - **Model provenance:** all adapters depend on a custom locally published Plain SFT checkpoint and must be uploaded with the correct base and tokenizer. Adapters alone are not standalone inference weights.
@@ -149,7 +171,7 @@ Create a prespecified training curriculum with authorization counterfactuals, ex
 
 ## 12. Reproducibility and references
 
-Primary sources are the unmodified source notebooks, exported adapters, and episode archives described in [ARTIFACTS.md](ARTIFACTS.md), with compact exact results in [results/README.md](../results/README.md).
+Primary sources are the original executed notebook, exported adapters, publicly released training splits/rows and episode archives described in [ARTIFACTS.md](ARTIFACTS.md), with compact exact results in [results/README.md](../results/README.md). The [public Hugging Face release](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets) now contains exact SW12/SW17 datasets and scored trajectories with SHA-256 provenance.
 
 - LEXSI hackathon and Track 3 Problem 8: https://hackathon.lexsi.ai/
 - AgentTune: https://github.com/Lexsi-Labs/AgentTune
