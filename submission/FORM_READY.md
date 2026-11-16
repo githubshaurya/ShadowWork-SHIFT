@@ -28,8 +28,6 @@
 
 **Public verification:** [Release audit](../docs/PUBLIC_RELEASE_VERIFICATION.md) records an actual completed unauthenticated Hub API gate and exact published collection contents. Do not hold submission for an unnecessary historical evidence addendum.
 
-## Action still requiring a human
+## Submission status: received
 
-Open the [official hackathon site](https://hackathon.lexsi.ai/) and use **Submit your project**. Enter the registered email and fields above, submit, and preserve the confirmation. **Deadline: November 15, 2026, 11:59 PM Anywhere on Earth = November 16, 2026, 5:29 PM IST.**
-
-This is a complete form handoff, **not** a claim that an official submission was sent.
+The participant subsequently provided the official LEXSI **“Submission received!”** confirmation page. The fields above are preserved as a submission preparation record; they are **not instructions to submit again**. Keep the email confirmation privately. The first-round deadline was November 15, 2026, 11:59 PM Anywhere on Earth (November 16, 2026, 5:29 PM IST).
