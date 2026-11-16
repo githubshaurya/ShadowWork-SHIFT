@@ -69,4 +69,13 @@ The public `sw12/` directory contains **558 files**: 160 train-only learner roll
 
 The **programmatic anonymous Hugging Face collection membership checks passed** in the actual publisher. A separate browser-based collection UI test was not available from this assistant environment; it is **not necessary to repeat the already-successful anonymous API test** to establish public artifact presence. The official hackathon form submission remains a separate user action, and this document makes no claim that it has been submitted.
 
-The intentionally focused public dataset consists of the main SW09/SW12/SW17 training/evaluation record. Older SW13–SW16 development archives are retained as supplementary Project sources; uploading all of them is optional and not required for verifying the central SW17 learning result.
+## 6. Reproducible data-quality and score verification
+
+The new [CPU-only public SW17 evidence verifier](../scripts/verify_sw17_public_evidence.py) provides a stricter independent audit than model/dataset existence checks alone. It recomputes the SHA-256 of **every one of the 496 public SW17 files** against the release manifest, verifies the **240/40/80 disjoint task splits**, confirms the real **160-rollout / 1,311-state / 859-disagreement-candidate / 400-selection / 211-actual-correction** dataset lineage, and checks the **395/400 exact rehearsal-stratum matches**, **400 common anchors**, both **80-step training logs**, all **320 sealed episode outcomes**, and the exact paired McNemar tests.
+
+The checking logic was tested on the original local SW17 evidence ZIP with an offline substitute for the Hub download layer and printed `SW17 PUBLIC EVIDENCE AUDIT PASS`. The script's **network download path has not yet been run end-to-end** in this audit environment; it is provided so judges can run it anonymously against the public files. Full SQLite action-by-action **replay** is implemented separately in the source SW17 notebook.
+
+**Release scope:** the fully public main experiment record covers SW09/SW12/SW17; older SW13–SW16 controller-development traces remain in retained Project ZIPs. They are **not necessary to verify the central fixed-controller SW17 training result**. The official hackathon language also asks teams to host all created logs and artifacts on Hugging Face. Under a strict interpretation, separately uploading these historical archives would remove any doubt about completeness; their current absence from the primary dataset should not be mistaken for publication of that history.
+
+**Metadata update note:** the GitHub [detailed SW17 dataset methodology](DATASET_METHOD.md) now contains the verified executed-run counts and a recorded training example. The mirrored Hugging Face `DATASET_METHOD.md` document is an older version; its underlying data files, live dataset card, and the new GitHub methodology are public and correct.
+
