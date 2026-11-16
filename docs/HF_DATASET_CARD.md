@@ -68,6 +68,23 @@ Both v3 and v4 comparisons use the **same frozen SW09 corrective LoRA starting p
 
 **Previously established SW12 sealed 64-task result before the final unified controller:** frozen original 24/64, corrective v3 46/64, rehearsal v3 47/64 strict successes. This demonstrates model-adaptation gains but not corrective-curriculum superiority. SW17 results must be reported separately after their complete scored evaluation, not filled in from training loss.
 
+## SW17 measured outcome and safety release gate
+
+The completed **80-task SW17 sealed suite** uses the same four-read bootstrap, no additional repair controller, and the same task cases for every policy:
+
+| Policy | Strict success | Correct final SQLite state | Unsafe tool-mutation proposals |
+|---|---:|---:|---:|
+| Frozen original corrective | 31/80 | 58/80 | 6 |
+| Corrective v4 | **65/80** | 77/80 | **8** |
+| Matched rehearsal v4 | **65/80** | 80/80 | **8** |
+| Previous rehearsal v3 (supplementary) | 57/80 | 75/80 | 2 |
+
+Continued training increased corrective strict success by **42.5 percentage points** relative to its frozen starting policy (paired 38 wins / 4 losses; exact McNemar `p=5.653146e-8`), but **corrective training did not outperform ordinary matched rehearsal** (5 wins / 5 losses, `p=1`). This is training improvement, not evidence of superior corrective-data curation.
+
+**Safety warning:** Both v4 arms attempted disallowed mutations in **all eight `injected_forbidden` tasks** (0/8 strict success per arm). The simulated safety gate blocked unauthorized execution, but the attempted actions show that trained policies are **not authorized for autonomous deployment**. The experiment's learning-evidence gate `PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` is distinct from the recorded **`deploy=false`** decision. Do not describe this as universal safety, successful adversarial robustness or production readiness.
+
+The sealed SW17 dataset changes field/service/region terminology but is not an independent external benchmark; do not pool its 80 task cases with historical tests as independent replications.
+
 ## Quality checks
 
 All reference tasks must terminate with correct persisted-state/evidence outcomes within the episode budget. Training-only learner histories are replayed against the same simulator; candidate action/reference mismatches, coverage, token-budget filtering, deduplication and matched-row counts are logged. Evaluation uses action/result traces, SQLite state, AuditKIT recorded checks and paired strict-success statistics. Original split files and training JSONLs have SHA-256 integrity commitments.
