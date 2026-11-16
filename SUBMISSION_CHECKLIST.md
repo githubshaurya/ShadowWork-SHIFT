@@ -32,9 +32,9 @@
 
 ## Deliberate scope choices (no blocker)
 
-- **Historical SW13–SW16 archives:** retained in Project and referenced in the technical report, but not merged into the lean SW12/SW17 public training/evaluation dataset. The optional [historical upload addendum](notebooks/FINAL_HF_Publish_Historical_Evidence_Addendum.ipynb) is **not a prerequisite** to submit.
+- **Historical SW13–SW16 archives:** retained in Project and referenced in the technical report, but deliberately not merged into the lean SW12/SW17 public training/evaluation dataset. No separate historical upload is required.
 - **Independent external benchmark:** not required for this first-round hackathon; SW17's prespecified synthetic schema shift is disclosed precisely.
-- **Hugging Face dataset card copy:** the published data already pass anonymous verification. GitHub's card text has now been updated with the final SW17 result. If desired, [this one-shot CPU-only card sync](notebooks/FINAL_HF_Refresh_Dataset_Card_Only.ipynb) refreshes the live Hugging Face README without touching any weights or datasets; it is **optional and must not delay form submission**.
+- **Hugging Face dataset card copy:** all data already pass anonymous verification. The GitHub card is current; the live Hub card can be synchronized with the maintained one-shot CPU-only publisher. The card utility remains available only until the Hub metadata has been verified as refreshed.
 - **HF Space / video / slides:** optional for first-round submission because an accessible public GitHub repository and write-up satisfy the official public-project condition. Shortlisted teams can use these for final judging.
 - **Browser-only HF collection UI:** a separate ordinary-browser check was not available inside this assistant environment. Actual completed anonymous API publication verification **did pass** and proves the public release and collection memberships; there is no technical publication blocker.
 - **Deployment:** the training improvement gate and production deployment gate are intentionally distinct; `deploy=false` is a safety-control result, not an incomplete artifact.
