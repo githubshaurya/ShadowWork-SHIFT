@@ -175,6 +175,7 @@ This matrix describes the **published technical submission**. Completing the off
 - [Technical report](docs/TECHNICAL_REPORT.md) · [SW17 result analysis](docs/SW17_RESULTS.md) · [Dataset construction](docs/DATASET_METHOD.md)
 - [Complete notebook sources](notebooks/) · [Reproduction steps](docs/REPRODUCIBILITY.md) · [Artifact provenance](docs/ARTIFACTS.md) · [Checks](SUBMISSION_CHECKLIST.md)
 - [Offline result verification](scripts/verify_archived_results.py) · [Anonymous Hugging Face verification](scripts/verify_hf_public_release.py)
+- [Public release verification ledger](docs/PUBLIC_RELEASE_VERIFICATION.md) · [Final form-ready field list](submission/FORM_READY.md)
 - [Final abstract (under 500 words)](submission/ABSTRACT.md)
 
 **Acknowledgments and attribution.** Developed for the [LEXSI AI Safety & Alignment Hackathon](https://hackathon.lexsi.ai/) in the Cohere Labs open-weights ecosystem. LEXSI **AgentTune** and **AuditKIT** are actual runtime/evaluation dependencies; **TRL/PEFT** carry out the supervised LoRA parameter updates. ChatGPT assisted with coding, analysis, source documentation and release packaging; the participant is responsible for experimental decisions and the final submission.
