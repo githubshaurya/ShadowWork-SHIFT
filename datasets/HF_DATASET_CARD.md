@@ -30,7 +30,11 @@ license: cc-by-nc-4.0
 
 **SW12 audited statistics:** 192 train + 32 dev + 64 sealed tasks; 160 train-only model rollouts; 1,276 learner states; 387 disagreement candidates; 400 selected learner states, of which **175** differ from the frozen model's action; 800 unique rows per arm; **452** identical prompt/completion pairs across the two realized arms (400 planned shared anchors plus 52 additional matches). Those numbers are from `ShadowWork_12_Closed_Loop_Evidence.zip`, not targets invented for this card.
 
-**SW17:** When the corresponding trained-run archive is included, see `sw17/` for its separate **10-family, 240/40/80-task** distribution-shift evaluation and 800-row v4 training arms. SW17 is a follow-up within the same synthetic simulator family, *not* an external benchmark. Do not mix SW12 and SW17 held-out denominators.
+**SW17 now fully released:** The separate `sw17/` directory includes the **10-family, 240 train / 40 development / 80 sealed-task** distribution-shift benchmark, **160 train-only frozen-learner rollouts**, both **800-example v4 training sets**, all **320 sealed scored episodes**, exact paired tests and original weight hashes. Both v4 adapters completed **80 actual LoRA optimizer steps** from the same SW09 starting model and were evaluated with an identical four-read bootstrap and no post-read repair controller.
+
+**Headline SW17 result:** frozen SW09 **31/80 (38.75%)** strict success; corrective v4 **65/80 (81.25%)**; matched rehearsal v4 **65/80 (81.25%)**. Corrective vs frozen: **38 paired wins, 4 losses, exact McNemar p = 5.65 × 10⁻⁸**. Corrective vs rehearsal: **5 wins, 5 losses, p = 1.0**. Thus the outcome establishes a **learning-associated improvement attributable to continued model training with the inference controller fixed**, but not corrective-curriculum superiority over matched rehearsal.
+
+**Safety evidence and deployment gate:** eight forbidden-action proposals per v4 arm were blocked by the simulator's executable authorization gate, and the recorded deployment gate remains `deploy=false`. These data test controlled synthetic failure recovery, not independent production transfer. SW12 and SW17 case denominators are separate.
 
 ## Files
 
@@ -49,7 +53,7 @@ The original SW09 training and 70-task holdout evidence are published separately
 
 ## Integrity and limitations
 
-The SW12 training rows and split JSONLs are published byte-for-byte from the archived run. Relevant original SHA values appear in [the methodological audit](https://github.com/githubshaurya/ShadowWork-SHIFT/blob/main/docs/DATASET_METHOD.md). Labels are scripted and verified within this simulator, not independently human-vetted. Because tasks share generator rules, generalization to unseen real services is **not established**. Rehearsal v3 scored **47/64**, versus **46/64** for corrective v3 under the same SW12 model-centric evaluation: failure-specific examples did not demonstrate unique superiority.
+The SW12 and SW17 training rows and split JSONLs are published byte-for-byte from their archived runs. Relevant original SHA values appear in [the methodological audit](https://github.com/githubshaurya/ShadowWork-SHIFT/blob/main/docs/DATASET_METHOD.md). Labels are scripted and verified within this simulator, not independently human-vetted. Because tasks share generator rules, generalization to unseen real services is **not established**. Rehearsal v3 scored **47/64**, versus **46/64** for corrective v3 under the same SW12 model-centric evaluation: failure-specific examples did not demonstrate unique superiority.
 
 **Intended usage:** Study learned self-healing and matched controls for stateful tool agents, test training/holdout leakage, and reproduce recorded simulator outcomes. Not intended as a certification of safe real-world autonomous writes.
 
