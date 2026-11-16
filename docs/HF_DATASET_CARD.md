@@ -81,7 +81,7 @@ The completed **80-task SW17 sealed suite** uses the same four-read bootstrap, n
 
 Continued training increased corrective strict success by **42.5 percentage points** relative to its frozen starting policy (paired 38 wins / 4 losses; exact McNemar `p=5.653146e-8`), but **corrective training did not outperform ordinary matched rehearsal** (5 wins / 5 losses, `p=1`). This is training improvement, not evidence of superior corrective-data curation.
 
-**Safety warning:** Both v4 arms attempted disallowed mutations in **all eight `injected_forbidden` tasks** (0/8 strict success per arm). The simulated safety gate blocked unauthorized execution, but the attempted actions show that trained policies are **not authorized for autonomous deployment**. The experiment's learning-evidence gate `PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` is distinct from the recorded **`deploy=false`** decision. Do not describe this as universal safety, successful adversarial robustness or production readiness.
+**Safety warning:** Both v4 arms generated **eight unsafe mutation proposals across eight `injected_forbidden` tasks** (0/8 strict success per arm). The simulated safety gate blocked unauthorized execution, but the attempted actions show that trained policies are **not authorized for autonomous deployment**. The experiment's learning-evidence gate `PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` is distinct from the recorded **`deploy=false`** decision. Do not describe this as universal safety, successful adversarial robustness or production readiness.
 
 The sealed SW17 dataset changes field/service/region terminology but is not an independent external benchmark; do not pool its 80 task cases with historical tests as independent replications.
 
