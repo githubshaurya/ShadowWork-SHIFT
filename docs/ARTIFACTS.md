@@ -71,3 +71,9 @@ The seven base weight-shard hashes publicly documented in `provenance/base_check
 ## Integrity conventions
 
 Retain the original evidence ZIPs in a `source_archives/` staging directory until checked; keep ZIP member names and SHA-256 checksums. Publish only curated, relevant artifacts, not redundant generated copies of identical tasks. Recompute metrics from exported episode JSONs and scorecards. No hand-entered data should replace raw traces for scientific verification.
+
+## SW17 actual trained weights and data provenance (pending HF upload)
+
+SW17 continuation from the original SW09 corrective adapter completed both equal-budget training arms. Original 80-step rehearsal_v4 adapter saved first, then learner_corrective_v4 saved after recovery from a repeated DDP launch failure. Both training JSONLs contain 800 rows, share 400 original expert anchors, and record hashes in `*_training_metadata.json`. The sealed test was precommitted as 80 synthetic tasks across 10 groups. Under identical four-read bootstrap and no further repair controller: frozen SW09 31/80, corrective v4 65/80 and rehearsal v4 65/80 strict. **Both v4 arms attempted unsafe mutations in all eight injected_forbidden tasks**, blocked by the simulator; do not claim deployment approval. See [dataset construction](DATASET_CONSTRUCTION.md) and [SW17 technical results](../results/README.md).
+
+The CPU-only [final SW12+SW17 publisher](../notebooks/FINAL_HF_Publish_SW12_SW17_From_Kaggle.ipynb) is the preferred replacement for the earlier SW12-only publisher; it uploads **four actual LoRA adapters**, exact SW12+SW17 training/split/audit/trace records, the transparent HF dataset card and release SHA-256 manifest. **The new HF model/data repos remain pending until that notebook actually succeeds and public files are verified.**
