@@ -9,7 +9,7 @@ ShadowWork-SHIFT is publicly released as executable source notebooks, exact trai
 3. Recompute exact McNemar statistics from paired `strict_success` values by `task_id`: corrective vs frozen **38 wins / 4 losses, p=5.653146e−8**; rehearsal vs frozen **36 wins / 2 losses, p=5.398761e−9**; corrective vs rehearsal **5 wins / 5 losses, p=1**.
 4. Read the saved per-episode `history`, `score`, `auditkit_verdict`, `final_value` and model-call usage. The [original SW17 scoring cell](../notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb) independently replays every recorded action against the SQLite simulator, asserts identical observed tool results, final persisted state and strict score.
 5. Cross-check `sha256_release_manifest.json` against downloaded data, plus model cards' `provenance/original_weights_sha256.txt` and the original `final_provenance.json` weight digests.
-6. For an anonymous Hub metadata test, run [scripts/verify_hf_public_release.py](../scripts/verify_hf_public_release.py). It checks four complete v3/v4 adapter repositories, the public dataset and collection memberships.
+6. For a quick anonymous Hub metadata test, run [scripts/verify_hf_public_release.py](../scripts/verify_hf_public_release.py). For a **deeper no-GPU check**, run [scripts/verify_sw17_public_evidence.py](../scripts/verify_sw17_public_evidence.py): it independently downloads all 496 public SW17 data files, checks release hashes and training/split metadata, verifies 320 individual episode strict outcomes, and recomputes exact paired McNemar tests. Full stateful SQLite **replay** remains in the executed source notebook.
 
 No GPU is required to inspect a task, recompute scorecard statistics or audit SHA-256 commitments.
 
