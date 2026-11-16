@@ -1,0 +1,72 @@
+# Public release verification: ShadowWork-SHIFT
+
+**Audit date:** 16 November 2026. **Scope:** first-round public artifact submission for LEXSI Track 3, Problem 8. This verifies the actual published trained adapters and SW12/SW17 primary dataset; it is not a new experiment.
+
+## 1. Publication evidence from the executed Kaggle notebook
+
+The completed user-executed Kaggle publisher was preserved in Project sources as `notebookc285845831 (1).ipynb`. It has no Python error outputs; code execution cells 1, 3, 5, 7, 9 and 11 completed in sequence. Its final `HfApi(token=False)` verification cell printed:
+
+> PUBLIC RELEASE GATE PASS: four model adapters, exact training data, two collections, episode evidence, and dataset method visible without login.
+
+This test deliberately disabled the Hugging Face token to simulate judge access. The same completed notebook printed the exact collection contents:
+
+**Model collection:**
+- `i-am-shaurya05/shadowwork-shift-plain-sft`
+- `i-am-shaurya05/shadowwork-shift-oracle-bc-v2`
+- `i-am-shaurya05/shadowwork-shift-rehearsal-bc`
+- `i-am-shaurya05/shadowwork-shift-learner-corrective`
+- `i-am-shaurya05/shadowwork-shift-corrective-v3`
+- `i-am-shaurya05/shadowwork-shift-rehearsal-v3`
+- `i-am-shaurya05/shadowwork-shift-corrective-v4`
+- `i-am-shaurya05/shadowwork-shift-rehearsal-v4`
+
+**Dataset collection:**
+- `i-am-shaurya05/shadowwork-shift-evidence-and-training`
+- `i-am-shaurya05/shadowwork-shift-datasets`
+
+The public API verifier reported **1,058 public dataset files** at the time of execution, including all required SW12/SW17 task and training files. A separate connected Hugging Face file browser independently displayed the four trained v3/v4 adapter file inventories (each **120,981,200-byte safetensors file**) and both `sw12/` and `sw17/` dataset folders. All four adapters report `peft_type=LORA`, rank 16 and the correct public custom full base `i-am-shaurya05/shadowwork-shift-plain-sft`.
+
+## 2. SW17 original archive and published data agreement
+
+The exact Project-source `ShadowWork_17_Training_Attribution_Evidence.zip` contains **497 ZIP members**: 496 original files and its own `evidence_sha256_manifest.json`. The ZIP CRC check passes and **every recorded original SHA-256 matches** the underlying file. It contains the original train/dev/sealed JSONLs, 160 frozen learner collection rollouts, 320 sealed scored agent episodes, both exact 800-row v4 training JSONLs, metadata, scorecards, paired tests and model-weight fingerprints.
+
+The public `sw17/` folder was independently enumerated: **496 files**, consisting of the same 160 train-only rollouts, **80 episodes per frozen SW09, corrective v4, rehearsal v4 and prior rehearsal v3** and 16 root metadata/results files. The project and published metadata agree on the frozen split hashes and model-weight fingerprints.
+
+| SW17 original trained LoRA | Original SHA-256, present in publicly released provenance |
+|---|---|
+| Corrective v4 | `ebf7ed229641faf882f51d55c8aa0a12be748984cb7370d1399c236ab38bbff3` |
+| Rehearsal v4 | `36e4f7b0686029465899d2931bb15deaf95e77f310da2f9c8f57a29996f74b99` |
+
+The exact SW17 training datasets contain **800 rows per arm**. The learner-state selection audit records 160 train-only rollouts, 1,311 learner-visited states, 859 learner/reference mismatch candidates, 400 selected learner-state examples, 211 actual corrections, and **395/400 exact action-stratum matches** for the rehearsal control. The `precommit.json` preserves seed `20261115` and 240/40/80 train/dev/sealed task identity boundaries.
+
+## 3. SW17 metric reproduction from original scored episodes
+
+| Policy | Strict success | Correct persisted state | Evidence supported | Unsafe proposals |
+|---|---:|---:|---:|---:|
+| Frozen SW09 corrective | 31/80 | 58/80 | 54/80 | 6 |
+| Corrective v4 | 65/80 | 77/80 | 73/80 | 8 |
+| Rehearsal v4 | 65/80 | 80/80 | 77/80 | 8 |
+| Previous rehearsal v3 | 57/80 | 75/80 | 60/80 | 2 |
+
+The 320-row episode-level scorecard reproduces the exact paired tests: corrective vs frozen **38 wins, 4 losses, p=5.65314621780999e−8**; rehearsal vs frozen **36 wins, 2 losses, p=5.398760549724102e−9**; corrective vs rehearsal **5 wins, 5 losses, p=1.0**. These comparisons hold the four-read bootstrap and evaluation task IDs constant, isolating the influence of continued training as far as the controlled experimental design permits.
+
+The model's proposed unauthorized mutations remain explicitly separate from *executed* forbidden state changes, and the recorded policy deployment decision is **HOLD**.
+
+## 4. SW12 public evidence
+
+The public `sw12/` directory contains **558 files**: 160 train-only learner rollouts, 384 evaluated episode records and 14 root data/score/provenance files, plus directory entries. Both 800-row SW12 training JSONLs are present, and their recorded release hashes match the source archives. The two public v3 model provenance files match the original adapter weight hashes:
+
+- SW12 corrective v3: `f1bf0dedc42b65d60f8f39563f6c569f7d15c72dd1d1b5266f83e501e59da741`
+- SW12 rehearsal v3: `fb693d1907fdd6a714bbfd0e664a8cb6091c325146f524e0e0a2f7b68e5c866f`
+
+## 5. URLs checked and release boundary
+
+- **Models collection:** https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac
+- **Datasets collection:** https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812
+- **Primary dataset:** https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
+- **Main code and report:** https://github.com/githubshaurya/ShadowWork-SHIFT
+- **Anonymous release-verifier script:** https://github.com/githubshaurya/ShadowWork-SHIFT/blob/main/scripts/verify_hf_public_release.py
+
+The **programmatic anonymous Hugging Face collection membership checks passed** in the actual publisher. A separate browser-based collection UI test was not available from this assistant environment; it is **not necessary to repeat the already-successful anonymous API test** to establish public artifact presence. The official hackathon form submission remains a separate user action, and this document makes no claim that it has been submitted.
+
+The intentionally focused public dataset consists of the main SW09/SW12/SW17 training/evaluation record. Older SW13–SW16 development archives are retained as supplementary Project sources; uploading all of them is optional and not required for verifying the central SW17 learning result.
