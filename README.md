@@ -130,7 +130,10 @@ See [Reproduction guide](docs/REPRODUCIBILITY.md) for dependencies, frozen check
 - [Artifact manifest](docs/ARTIFACTS.md): original experiment ZIPs, weights, seeds and provenance.
 - [Results](results/README.md): compact verified result tables.
 - [Offline verification script](scripts/verify_archived_results.py): recompute exact counts from source archives.
-- [Hugging Face publishing notebook](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb): publish two SW12 v3 adapters and latest evaluation evidence.
+- [Audited dataset creation and provenance](docs/DATASET_METHOD.md): seeded simulator generation, frozen learner rollouts, observation-conditioned labeling, matched controls, exact split and training hashes, and caveats.
+- [SW17 fixed-controller results](docs/SW17_RESULTS.md): 31/80 frozen → 65/80 after each v4 fine-tuning arm; matched rehearsal tie; 8 unsafe proposals per v4 arm, so **not deployable**.
+- [Hugging Face dataset card](datasets/HF_DATASET_CARD.md): intended uses, generation, row counts, provenance and limitations.
+- [Hugging Face publishing notebook](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb): uploads existing SW12 v3 and SW17 v4 adapters plus the exact audited SW12/SW17 training datasets and traces; **does not train**.
 - [Submission checklist](SUBMISSION_CHECKLIST.md): final public-link and form gate.
 
 **Acknowledgment:** Built for the [LEXSI AI Safety & Alignment Hackathon](https://hackathon.lexsi.ai/) using the Cohere open-weight model ecosystem, AgentTune, AuditKIT, TRL, PEFT, and the Hugging Face Hub. No claim is made that the two LEXSI libraries by themselves perform the LoRA optimization.
