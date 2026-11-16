@@ -18,7 +18,7 @@ tags:
 
 **Provenance:** Deterministically generated synthetic stateful-maintenance tasks; actual learner rollouts on train-only cases; observation-conditioned, scripted reference continuations; matched rehearsal controls; executable SQLite replay and SHA-256 split/row commitments. **No human-expert annotation, production incident collection or independent external benchmark is claimed.**
 
-**Data publication target:** `i-am-shaurya05/shadowwork-shift-datasets`. See the original SW09 source data in [shadowwork-shift-evidence-and-training](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training).
+**Published data:** `i-am-shaurya05/shadowwork-shift-datasets` (SW12/SW17 training rows, committed splits, learner rollouts and evaluation episodes). See the original SW09 source data in [shadowwork-shift-evidence-and-training](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training).
 
 ## Why the dataset was created
 
@@ -60,7 +60,7 @@ SW12 contains eight fault families (`normal`, `double_conflict`, `double_noop`, 
 - `sw17/collection/` and `sw17/evaluation/`: train-only learner rollouts and sealed evaluation traces.
 - `archived_evidence/`: selected SW09/SW13–SW16 original archives when supplied at publishing time.
 
-**Availability note:** only files listed in the repository's **Files and versions** tab should be considered published. The file guide is a release schema, not a claim that every optional archived file was already uploaded.
+**Availability:** core SW12 and SW17 dataset files are now uploaded and anonymously accessible; older optional SW13–SW16 source archives remain separately retained as historical supplements. See [public verification ledger](PUBLIC_RELEASE_VERIFICATION.md).
 
 ## Training and evaluation
 
