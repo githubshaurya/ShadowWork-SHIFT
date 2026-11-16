@@ -7,6 +7,8 @@
 
 Stateful tool-using agents can fail despite syntactically valid actions: an acknowledged write may not persist, an observed state may be stale, the agent may terminate before collecting enough verification evidence, or a mutation may be unauthorized. ShadowWork-SHIFT investigates a self-healing pipeline for these failures using a Cohere Tiny Aya-derived tool policy, AgentTune tool execution and harnessing, AuditKIT recorded evaluation, learner-state corrective fine-tuning with TRL/PEFT LoRA, and conservative observation-grounded runtime controllers. Frozen and adapted policies are compared on matched synthetic workflows, with strict success requiring authorized and verified completion rather than merely a plausible final answer. On an SW09 sealed 70-task holdout, the original parent adapter scored 42/70 strict and a corrective adapter 70/70; importantly, a simple parent-plus-early-finish controller already scored 69/70. On a distinct SW12 shifted-protocol sealed 64-task evaluation, the original corrective adapter scored 24/64, corrective v3 scored 46/64, and compute/data-matched rehearsal v3 scored 47/64 without the final unified controller. With a common SW16 unified controller, original corrective, corrective v3, and rehearsal v3 scored 132/160, 154/160, and 160/160, respectively, on 160 SW12 core/composed tasks. A focused budgeted repair increased corrective v3 to 156/160 with no paired losses, without statistical significance for the two newly fixed cases. Results support effective self-healing *as an end-to-end engineered pipeline* and measurable adaptation benefits, but do not establish a unique advantage for failure-specific labels over rehearsal or transfer to external production environments.
 
+
+**Final fixed-controller SW17 update:** corrective v4 and matched rehearsal v4 both reached **65/80 strict** versus **31/80** for the frozen starting policy on a new 80-task sealed synthetic suite, showing a 42.5-point training-associated improvement without corrective-curriculum superiority. Both v4 arms nevertheless proposed an unsafe mutation on **all eight authorization-forbidden tasks**; the tool gate blocked execution. This is a safety **HOLD**, not a deployment pass.
 ## 1. Problem and hypothesis
 
 **Failure model.** The agent runs an authorized state transition in a gated workflow. Correctness is not determined by whether a tool returns an acknowledgment; it depends on the durable state and the evidence supporting termination. Failure families include:
@@ -87,6 +89,27 @@ On 160 SW12 core/composed task instances, use the same unified_v4 controller for
 On the same corrective v3 model, the targeted_v3 controller scores 59/96 core and 35/64 composed; unified_v4 scores 94/96 and 60/64. Thus the more dramatic headline jump is **runtime engineering**, while the fixed-controller model comparison supports genuine **training/adaptation** gains.
 
 SW16 SW09 retention (56 new tasks): corrective v3 and rehearsal v3 both score 56/56 strict under unified_v4, original corrective 45/56. The SW16 `deployment_decision.txt` was **HOLD**, specifically because one corrective-v3 composed-state regression occurred against the targeted baseline. The gate decision must remain visible even though aggregate strict success improved.
+
+
+
+## SW17: fixed-controller adaptation, paired evaluation and authorization regression
+
+SW17 generated 240 training tasks, 40 development tasks and **80 new precommitted sealed synthetic tasks** across 10 fault groups, including `approval_not_required` and `lease_expired`. Training used 160 actual original-learner rollouts from training-only tasks, 400 identical anchor demonstrations and 400 arm-specific training rows per arm. Both v4 LoRA adapters continued from the same original SW09 corrective checkpoint for 80 steps (effective batch 8, LR 5e-5), rather than using a revised controller. See [transparent dataset construction](DATASET_CONSTRUCTION.md).
+
+All SW17 comparisons use the **same four scripted initial reads**, after which the model chooses subsequent actions with no additional repair controller. Strict success on the shared 80-task sealed suite:
+
+| Policy | Strict | State correct | Evidence supported | Unsafe mutation proposals | Mean steps | Mean model calls |
+|---|---:|---:|---:|---:|---:|---:|
+| Original frozen SW09 corrective | 31/80 | 58/80 | 54/80 | 6 | 11.775 | 7.775 |
+| Continued corrective v4 | **65/80** | 77/80 | 73/80 | 8 | 14.4375 | 10.4375 |
+| Equal-budget rehearsal v4 | **65/80** | 80/80 | 77/80 | 8 | 12.0875 | 8.0875 |
+| Earlier rehearsal v3, supplemental comparator | 57/80 | 75/80 | 60/80 | 2 | 11.875 | 7.875 |
+
+**Causal interpretation:** under the fixed controller, corrective v4 makes **34 more strict successes (42.5 percentage points)** than its frozen starting policy; paired wins/losses = 38/4, exact McNemar `p=5.653146e-8`. Matched rehearsal v4 makes the **same 65/80** strict successes; corrective versus rehearsal discordances = 5/5, `p=1`. The evidence supports *model updating*, **not** a unique benefit of learner-visited corrective labels. The initial four observations are deterministic in every condition, so this is not fully controller-free interaction.
+
+**Crucial negative safety result:** Every `injected_forbidden` sealed case produced at least one unsafe mutation proposal in both v4 arms (8/8 proposals and 0/8 strict successes per arm). Frozen original SW09 had 6 unsafe proposals and 2/8 strict successes; previous rehearsal v3 had 2 proposals and 6/8 strict successes. The simulator's authorization guard blocks disallowed tool calls, so a blocked *proposal* must not be equated with a forbidden *executed mutation*. Nevertheless, the v4 agents do **not** satisfy the proposed autonomous deployment requirements. SW17's recorded `experiment_gate=PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` is a **narrow learning-attribution gate**; its recorded `deploy=false` remains controlling. The appropriate rollout recommendation is **HOLD** until unsafe proposals are addressed and evaluated on a fresh, untouched holdout.
+
+**Generalization limits:** SW17 changes service/region/request vocabulary and adds previously unseen configuration fields, but remains within the same simulator family. Corrective v4 was 31/40 on unseen fields, rehearsal v4 36/40, previous rehearsal v3 40/40 and frozen SW09 18/40. This does not establish external transfer. All four SW17 evaluations refer to the **same 80 tasks**, not 320 independent tasks. The procedure and per-task trace packaging are documented in [SW17 notebook](../notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb) and the [dataset publication notebook](../notebooks/FINAL_HF_Publish_SW12_SW17_From_Kaggle.ipynb).
 
 ## 8. Focused budgeted v5 regression repair
 
