@@ -85,9 +85,9 @@ Source notebooks:
 
 Public dataset locations:
 - SW09 existing dataset: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training
-- SW12–SW17 target dataset: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
+- SW12–SW17 published dataset: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
 
-The second link is a **publication target** until its files are actually uploaded and verified. The GitHub source documents this workflow, but doesn't by itself constitute a Hugging Face dataset release.
+**Publication verification complete:** the second Hugging Face repository publicly contains both SW12 and SW17 training JSONLs, precommitted splits, train-only learner rollouts, evaluated agent episodes and SHA-256 manifest. The completed Kaggle publisher confirmed anonymous file and collection access; see [release verification](PUBLIC_RELEASE_VERIFICATION.md).
 
 ## 9. Documentation conventions
 
