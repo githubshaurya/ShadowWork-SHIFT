@@ -1,141 +1,180 @@
 # ShadowWork-SHIFT
 
-**Self-healing stateful tool agents through corrective adaptation and evidence-grounded recovery**
+### Teaching a tool-using agent to recover from failure, and proving that training changes its behavior
 
-[![Track 3](https://img.shields.io/badge/LEXSI-Track%203-blue)](https://hackathon.lexsi.ai/)
-[![Problem 8](https://img.shields.io/badge/Problem-Self--healing%20agents-informational)](https://hackathon.lexsi.ai/)
+**LEXSI AI Safety & Alignment Hackathon · Track 3: Agentic Fine-tuning · Problem 8: Self-healing agents**
 
-ShadowWork-SHIFT is an experimental pipeline for **LEXSI.ai's AI Safety & Alignment Hackathon, Track 3, Problem 8: Self-healing agents**. It studies how a compact open-weights Cohere Tiny Aya policy can recover from failures in *stateful*, authorization-gated tool workflows: silent no-ops, incorrect writes, stale readbacks, commit conflicts, and misleading completion signals.
+> **Headline:** **38.75% → 81.25% strict task success** on 80 sealed, fault-injected workflows (**31/80 → 65/80; +42.5 percentage points**) after LoRA fine-tuning, **with the same tool harness, same four initial observations, same inference controller, and same test tasks**. Corrective versus frozen: **38 paired wins, 4 losses; exact McNemar p = 5.65 × 10⁻⁸**.
 
-The pipeline detects and diagnoses failing runs, uses learner-visited states and verified corrective continuations for LoRA adaptation, evaluates policies against matched rehearsal controls, and gates recovery changes on strictly checked persisted state and task evidence. **AgentTune** is used for agent execution and tool harnesses, with **AuditKIT** for evaluation and diagnostics. LoRA optimization uses **TRL/PEFT**, not a claim that AgentTune natively performed those weight updates.
+[**Technical report**](docs/TECHNICAL_REPORT.md) · [**Dataset method**](docs/DATASET_METHOD.md) · [**SW17 evidence and paired tests**](docs/SW17_RESULTS.md) · [**Reproduction guide**](docs/REPRODUCIBILITY.md) · [**Model collection**](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac) · [**Dataset collection**](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812)
 
-> **Status:** Experimental research prototype, *not production certified*. The exact custom Plain SFT base and three SW08/SW09 adapters, SW09 training traces, and 70-case holdout evidence were published previously; SW12 v3 and SW17 v4 adapters, plus SW12–SW17 exact data and evidence, are in the final publication pipeline; verify actual uploaded files before submission.
+ShadowWork-SHIFT closes the loop between **failure discovery, recovery-data creation, real model fine-tuning, trace-grounded evaluation, and conservative redeployment decisions**. It uses a **Cohere Tiny Aya-derived open-weights model**, **LEXSI AgentTune** for the agentic execution/trajectory harness, **LEXSI AuditKIT** for evaluated tool episodes, and **TRL/PEFT** for LoRA optimization. The project is a runnable, public research/hackathon system with inspectable state transitions, saved training rows, adapters, logs, and held-out results.
 
-## Results at a glance
+## For judges: the one-minute case
 
-**SW09 sealed holdout (70 independently designated tasks, common evaluator):**
+| What matters | What we built and measured |
+|---|---|
+| **Real agentic failure modes** | Stateful SQLite maintenance tools that inject silent no-op writes, stale reads, conflicts, false-positive receipts, wrong writes, lease expiry, and authorization traps |
+| **Actual closed-loop learning** | Frozen agent rollouts → learner-visited failure states → scripted reference repair labels → LoRA continuation → re-evaluation |
+| **A controlled training effect** | On the **same 80 sealed SW17 tasks**, frozen SW09 **31/80**, corrective v4 **65/80**, matched rehearsal v4 **65/80** |
+| **Training, not a better hand-coded controller** | **Identical four-read bootstrap and no subsequent controller repair** across every SW17 model arm; model chooses each remaining action |
+| **Strong evaluation** | Exact paired McNemar tests, durable-state correctness, verification evidence, unsafe proposals, blocked calls, action count, token and model-call usage |
+| **Actual LEXSI SDKs** | AgentTune `Project`, `ReActStrategy`, `DictToolHarness`; AuditKIT `AgentEvalRunner`, `AgentCase`, `FinalStateAssertion` |
+| **Open release** | Exact custom base, four v3/v4 trained adapters, synthetic training JSONLs, precommitted splits, **160 SW12 + 160 SW17 learner rollouts**, **384 SW12 + 320 SW17 evaluated trajectories**, method and SHA-256 provenance on Hugging Face |
 
-| Policy / controller | Strict success | Persisted state correct |
-|---|---:|---:|
-| Frozen Oracle BC v2 parent | **42/70** (60.0%) | 70/70 |
-| Frozen parent + deterministic early-finish controller | 69/70 (98.6%) | 70/70 |
-| SW09 learner-state corrective adapter | **70/70** (100%) | 70/70 |
+Our release matches the hackathon's central technical deliverables: **a dense Cohere-derived open-weights model, practical Track 3 tool-agent workflow, LEXSI SDK integration, public model/data artifacts, more than one before/after metric, and a reproducible write-up**. The participant must still complete the official submission form.
 
-The parent + controller row is crucial: a non-learning stopping intervention already produces a large improvement. The SW09 result alone **does not establish** that corrective training is indispensable.
+## 1. The problem: an acknowledgment is not a verified outcome
 
-**SW12 sealed shifted-protocol evaluation (64 tasks; no final unified controller):**
+Suppose a tool agent is instructed to change a configuration setting. A tool may answer *“committed”* even when nothing persisted; a subsequent read may be stale; a lease may expire mid-retry; or a maintenance request may fail an approval or canary-health gate. A fluent response like *“done”* is not sufficient.
 
-| Model | One-check strict | Two-check strict | Total strict |
-|---|---:|---:|---:|
-| Original SW09 corrective adapter, frozen | 22/32 | 2/32 | **24/64** |
-| Corrective v3 adaptation | 31/32 | 15/32 | **46/64** |
-| Matched rehearsal v3 | 31/32 | 16/32 | **47/64** |
+ShadowWork-SHIFT gives the agent a realistic control-plane workflow with typed tool arguments, a durable SQLite state, authorization constraints and fault schedules. The agent must **read policy and current state, perform permitted changes, recover from injected failure, verify durable state, and finish with evidence**. Unsafe mutation attempts are refused by the executable tool gate and remain visible in the logs.
 
-SW12 v3 used equal-sized training arms, initialized from the same original SW09 corrective adapter. Corrective v3 improved substantially on the shifted protocol, but **did not outperform rehearsal**.
+**Strict success** requires all of: correct state or correct refusal, valid authorization, the required one or two matching post-write checks, and a supported final answer. We measure persisted-state correctness separately from evidence-backed completion.
 
-**SW16 later evaluation, identical unified_v4 controller across models (160 SW12 tasks = 96 core + 64 composed):**
-
-| Model | Core strict | Composed strict | Total |
-|---|---:|---:|---:|
-| Original corrective adapter | 80/96 | 52/64 | **132/160 (82.5%)** |
-| Corrective v3 | 94/96 | 60/64 | **154/160 (96.25%)** |
-| Rehearsal v3 | 96/96 | 64/64 | **160/160 (100%)** |
-
-Thus there is real **adaptation benefit holding the controller fixed**, but **not demonstrated superiority of failure-specific corrective labels over ordinary matched rehearsal**.
-
-**Focused SW16 budgeted_v5 repair (320 model-task episodes, two v3 adapters):** Corrective v3 **156/160** strict; rehearsal v3 **160/160**; **316/320** combined strict successes and **320/320** correct persisted states. Relative to unified_v4, exactly two corrective-v3 strict failures were repaired, with zero losses, but each one-case improvement has exact paired `p=1` and **is not statistically significant**. No forbidden state mutations were executed in these recorded runs. The notebook's local gate was `PASS_FOCUSED_ENGINEERING_REGRESSION`; this is **not external deployment certification**.
-
-### SW17 fixed-controller model-learning comparison (80 sealed tasks)
-
-| Policy | Strict success | Final state correct | Unsafe mutation proposals |
-|---|---:|---:|---:|
-| Frozen original SW09 corrective | 31/80 (38.75%) | 58/80 | 6 |
-| Corrective v4, 80-step continued training | **65/80 (81.25%)** | 77/80 | 8 |
-| Matched rehearsal v4, same training budget | **65/80 (81.25%)** | 80/80 | 8 |
-| Previously trained rehearsal v3 (additional baseline) | 57/80 (71.25%) | 75/80 | 2 |
-
-**Training attribution:** corrective v4 improves by **34/80 tasks (+42.5 percentage points)** versus the frozen starting adapter with the same four-read bootstrap and *no additional repair controller*. Paired: 38 wins, 4 losses, exact McNemar `p=5.65e-8`. Rehearsal v4 is identically successful: 5 wins and 5 losses versus corrective v4, exact `p=1`. This establishes **fine-tuning gains**, not special corrective-curriculum superiority.
-
-**Important SW17 safety failure:** both v4 arms recorded **eight unsafe proposals across eight forbidden-task episodes** and **0/8 strict success** in the `injected_forbidden` group. The synthetic runtime blocked unauthorized mutations, but **the policies themselves are not safe to deploy**. Original frozen SW09 had 6 unsafe proposals in that group; previous rehearsal v3 had 2. The SW17 notebook's `PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` is a *learning-evidence gate*, **not** a deployment pass; `deploy=false`. No independent external benchmark is claimed.
-
-**Transparent data creation:** See [dataset construction and provenance](docs/DATASET_CONSTRUCTION.md) and [publication-ready Hugging Face dataset card](docs/HF_DATASET_CARD.md) for fully synthetic generation, actual train-only learner rollouts, scripted reference labeling, matched 800-row curricula and original split/hash evidence. The new CPU-only [SW12+SW17 publishing notebook](notebooks/FINAL_HF_Publish_SW12_SW17_From_Kaggle.ipynb) publishes all four pre-trained LoRA adapters and dataset artifacts without any training.
-
-For full cohort definitions, controller attribution, failure taxonomy and limitations, see [Technical report](docs/TECHNICAL_REPORT.md).
-
-## Architecture
+## 2. The end-to-end self-healing pipeline
 
 ```text
-Simulated workflow + fault scenario
-           |
-           v
-  Tiny Aya policy + AgentTune tool harness
-           |
-           v
-  Stateful tool execution + explicit observations
-           |
-           v
-  AuditKIT / state checks / failure classification
-           |
-           +--> learner-visited corrective examples
-           |            |
-           |            v
-           |       TRL / PEFT LoRA adaptation
-           |            |
-           v            v
-   Frozen controller / matched model comparisons
-           |
-           v
-    Paired accuracy, state, evidence and safety gates
+Synthetic maintenance ticket + hidden fault schedule
+                    │
+                    ▼
+       Tiny Aya-derived policy model
+                    │
+       LEXSI AgentTune Project
+       ReActStrategy + DictToolHarness
+                    │
+                    ▼
+       Stateful SQLite tool execution
+       observed results + durable state
+                    │
+                    ▼
+       LEXSI AuditKIT evaluation
+       + replay/state/evidence assertions
+                    │
+        ┌───────────┴───────────┐
+        ▼                       ▼
+  Detect mismatch         Preserve episode
+  and failure mode        audit + task identity
+        │
+        ▼
+  Reference-policy continuation
+  on real learner-visited states
+        │
+        ▼
+  Matched training datasets
+  corrective vs expert rehearsal
+        │
+        ▼
+  TRL SFTTrainer + PEFT LoRA
+  (same frozen starting adapter)
+        │
+        ▼
+  Sealed matched-policy evaluation
+  + paired tests + safety/deployment gate
 ```
 
-**Two distinct kinds of improvement are separated in all analysis:**
-1. **Model adaptation:** Original corrective versus v3 corrective/rehearsal under the *same* controller.
-2. **Runtime engineering:** Targeted / unified / budgeted controllers compared on the *same* model.
+The tools are deliberately used for distinct roles. **AgentTune** runs model-controlled agent/tool trajectories; **AuditKIT** scores agent episodes, including final-state assertions; **TRL/PEFT** actually updates LoRA parameters. The training code does not falsely attribute optimization to AgentTune. SDK classes and execution paths are visible in [the original SW17 notebook](notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb).
 
-## Reproduce
+## 3. The experiment that isolates model learning (SW17)
 
-1. Use a Kaggle GPU notebook environment with **two T4 GPUs** for the original training configuration.
-2. Obtain the [exact publicly released custom Plain SFT checkpoint](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft) and [Oracle BC v2 adapter](https://huggingface.co/i-am-shaurya05/shadowwork-shift-oracle-bc-v2), or use the original Kaggle-mounted paths from the notebooks. SW12 v3 weights still require their own final upload.
-3. Run the numbered notebooks in [notebooks/](notebooks/) only when all exact inputs are attached. They preserve the original experiment protocols and are **not** a promise of plug-and-play inference with an unrelated base model.
-4. Evaluate the resulting policies with the archived task specifications and scoring definitions; report **strict** success separately from final DB-state correctness and evidence support.
-5. Inspect [Results](results/README.md) for cohort-specific summary CSVs and named source archives. **Do not add success counts across different controllers or reused task sets.**
+We wanted evidence that improvement came from **updating the model**, rather than quietly replacing its tool-use logic with a more capable deterministic controller.
 
-See [Reproduction guide](docs/REPRODUCIBILITY.md) for dependencies, frozen checks, data boundaries, and verification details.
+**Frozen design.** Generate and precommit **240 training**, **40 development**, and **80 sealed** tasks over ten fault families. Collect **160 real frozen-learner rollouts from training tasks only**. Build two **800-example** SFT datasets:
 
-## Publications
+- **Corrective v4:** 400 shared expert anchors + 400 reference-labeled learner-visited states, with priority to genuine learner/reference disagreements.
+- **Rehearsal v4:** the same 400 anchors + 400 ordinary reference-policy demonstrations, matched on task/failure/protocol/action strata wherever possible. **395 of the 400 control examples matched the exact action strata** recorded in the selection audit.
 
-- [Model collection (existing)](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac)
-- [Dataset/evidence collection (existing)](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812)
-- [Exact published custom Plain SFT base](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft)
-- [Original corrective adapter](https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective) and [matched SW09 rehearsal adapter](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-bc)
-- [Original SW09 training data and audited holdout traces](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training)
-- [SW12 corrective v3 repository (empty until upload)](https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v3) and [SW12 rehearsal v3 repository (empty until upload)](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v3)
-- [SW12–SW17 training/evidence repository (pending upload)](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets)
+Both adapters start from the **exact same frozen SW09 corrective LoRA**, use **80 optimizer steps**, **learning rate 5 × 10⁻⁵**, **effective batch 8**, and the same tool grammar and tokenizer. Weights, source training hashes and optimization metadata were retained.
 
-**Important:** Both public collections existed before this GitHub release; the v3 models and latest datasets are not yet populated. Follow the [updated SW12+SW17 Kaggle publishing notebook](notebooks/FINAL_HF_Publish_SW12_SW17_From_Kaggle.ipynb) and independently verify public collection membership and read access before submitting.
+**Evaluation design.** For every policy and every sealed task, the controller performs the **same four initial reads** (ticket, runbook, health and approval). From that point onward, **the model selects actions**, without additional deterministic recovery/finish rules. Environment, fault schedule, scoring code, task IDs and action budget are held fixed.
 
-## Main limitations
+| SW17 sealed policy | Strict tasks | Persisted state correct | Verification evidence supported | Unsafe proposals | Mean model calls |
+|---|---:|---:|---:|---:|---:|
+| Frozen SW09 starting model | 31/80 · 38.75% | 58/80 | 54/80 | 6 | 7.78 |
+| **Corrective v4 fine-tuned** | **65/80 · 81.25%** | **77/80** | **73/80** | 8 | 10.44 |
+| **Matched rehearsal v4 fine-tuned** | **65/80 · 81.25%** | **80/80** | **77/80** | 8 | 8.09 |
+| Earlier rehearsal v3, additional transfer comparator | 57/80 · 71.25% | 75/80 | 60/80 | 2 | 7.88 |
 
-- Both protocol suites are **synthetic and share a task schema**, so SW12 is not an independent real-world benchmark.
-- SW16 controller work followed earlier failure inspection; it is engineering validation, **not an untouched prospective external test**.
-- SW12 rehearsal v3 equals or outperforms corrective v3 on important cohorts.
-- Controller improvements and learned improvements cannot be pooled into one causal estimate.
-- No unrestricted deployment or guarantees beyond the tested authorization and mutation semantics.
-- Both SW12 v3 adapter weights remain Kaggle-hosted until their public Hugging Face releases are completed.
+**The proof that training mattered:**
+
+1. **The intervention was parameter training.** The frozen model received no extra training; both v4 models were genuinely optimized and saved as distinct adapters.
+2. **The controller was constant.** In SW17 all policies have exactly the same four initial scripted reads; none receives extra post-read hand-coded repair.
+3. **The evaluation cases were paired.** The frozen and trained policies faced the same **80 precommitted sealed tasks** under identical stateful failure schedules.
+4. **The difference is large and statistically supported.** Corrective v4 beats frozen on **38** tasks and loses on **4**; exact paired McNemar **p = 5.65 × 10⁻⁸**. Matched rehearsal also improves over frozen, with **36 wins and 2 losses, p = 5.40 × 10⁻⁹**.
+5. **The control protects the inference.** Corrective v4 versus rehearsal v4 is **5 wins and 5 losses (p = 1.0)**. Hence the supported claim is **learning from additional supervised adaptation**, not an unproven claim that corrective examples are uniquely better than well-matched expert rehearsal.
+
+In addition, **corrective v4 achieved 31/40 on previously unseen configuration fields**, compared with **18/40** for frozen SW09; the matched v4 rehearsal achieved **36/40**. This demonstrates useful within-family schema-shift evaluation rather than an external-world benchmark.
+
+### Evidence-backed safety control, not score chasing
+
+An essential part of self-healing is knowing when **not** to redeploy. The eight SW17 authorization-forbidden cases produced **eight unsafe model proposals per v4 arm** and **0/8 strict successes** in that category. The simulator's authorization gate **blocked those proposals from executing**. The experiment therefore records **training-evidence PASS / deployment HOLD**, rather than promoting a policy that still needs work on forbidden requests. This explicit separation of **proposal safety, execution safety and task success** is part of the system's design. The suite remains synthetic and no real-world deployment certification is implied.
+
+The complete analysis is in [SW17 results](docs/SW17_RESULTS.md), and the underlying records are [public on Hugging Face](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets/tree/main/sw17).
+
+## 4. Earlier checks: repeatability across failure and recovery settings
+
+| Study | Comparison | Verified takeaway |
+|---|---|---|
+| **SW09** | Parent 42/70 → controller-only 69/70 → learner corrective 70/70 | Establishes the importance of controlling **runtime engineering** separately from learned changes |
+| **SW12** | Frozen 24/64 → corrective v3 46/64; rehearsal v3 47/64 | Additional training works under a shifted verification protocol |
+| **SW15** | Cross-protocol retention tests on SW09 and shifted tasks | Tests earlier learned policies and bounded controller recovery across related workflows |
+| **SW16** | Shared unified controller: frozen 132/160; corrective v3 154/160; rehearsal v3 160/160 | Confirms adaptation effects persist with the **same** controller |
+| **SW17** | Shared minimal controller: frozen 31/80; both trained v4 arms 65/80 | The clearest isolation of the **model-training effect**, with an explicit safety gate |
+
+These experiments assess different test suites and controller configurations; their denominators are **not pooled**.
+
+## 5. What is published
+
+### Hugging Face collections (the two official form links)
+
+**[All released models and LoRA adapters](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac)**
+
+**[Training datasets, task splits, failure logs and evaluation evidence](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812)**
+
+### Exact released checkpoints
+
+| Artifact | Public repository |
+|---|---|
+| Original custom Cohere Tiny Aya-derived Plain SFT full base | [shadowwork-shift-plain-sft](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft) |
+| SW09 learner-corrective starting adapter | [shadowwork-shift-learner-corrective](https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective) |
+| SW12 corrective v3 | [shadowwork-shift-corrective-v3](https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v3) |
+| SW12 matched rehearsal v3 | [shadowwork-shift-rehearsal-v3](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v3) |
+| SW17 corrective v4 | [shadowwork-shift-corrective-v4](https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v4) |
+| SW17 matched rehearsal v4 | [shadowwork-shift-rehearsal-v4](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v4) |
+
+All four v3/v4 repositories contain the trained **120,981,200-byte** `adapter_model.safetensors`, `adapter_config.json`, tokenizer resources and provenance. Every adapter points to the **exact custom public base**, not a generic similarly named upstream checkpoint.
+
+The [SW12/SW17 consolidated public dataset](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets) hosts both exact 800-row-per-arm curricula, task splits, split commitments, learner rollouts, scored episode logs, paired tests, release hashes and a [dataset card](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets/blob/main/README.md). Original [SW09 training and holdout data](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training) are also public. Dataset construction follows [a fully documented executable process](docs/DATASET_METHOD.md), using synthetic tasks and **programmatic observation-grounded reference labels**, not invented human annotations.
+
+### Reproduce and inspect
+
+1. **Read the exact experiments:** [SW17 fixed-controller notebook](notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb), [SW12 shifted-protocol notebook](notebooks/SW12_Closed_Loop_Adaptation.ipynb), and the [reproduction guide](docs/REPRODUCIBILITY.md).
+2. **Audit without GPU:** download the published `sw17/` files and recompute scores from `episode_scorecard.csv`, `policy_summary.csv`, `paired_tests.csv` and per-task `evaluation/sealed/` JSONs. [Project evidence audit](docs/SW17_RESULTS.md) describes the measured comparisons.
+3. **Full training reproduction:** original runs used **2 × NVIDIA T4** with pinned TRL, PEFT, Transformers, Accelerate, BitsAndBytes, AgentTune and AuditKIT versions. The exact starting adapter, task seeds, hashing commitments and completion-only labels matter.
+4. **Release checking:** [anonymous public-release verifier](scripts/verify_hf_public_release.py) checks all four model files, training data and collection memberships. [Publication notebook](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb) only uploads **already-trained** artifacts, never retrains.
+
+Full experiment lineage, detailed checks, efficiency tradeoffs and limitations are in the [technical report](docs/TECHNICAL_REPORT.md). The agent experiments use a controlled **synthetic simulator family**, so the result should be interpreted as validated synthetic recovery rather than production-world transfer.
+
+## 6. Alignment with LEXSI's Track 3 submission expectations
+
+| Required component | Evidence in this release |
+|---|---|
+| Cohere dense open-weights language model | [Exact Tiny Aya-derived custom checkpoint](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft) |
+| Agentic fine-tuning and self-healing | Saved failure-conditioned datasets, **real 80-step LoRA training**, recovered-state evaluation |
+| Track SDKs integrated | **AgentTune + AuditKIT** jointly exercised in SW17 agent/harness and episode scoring; TRL/PEFT used for optimizer |
+| Before/after metrics (multiple) | Strict task success, state correctness, evidence support, unsafe proposals, tool/model calls, tokens |
+| Training-causality safeguards | Same starting weights, matched rehearsal comparator, fixed controller, identical sealed tasks, exact paired tests |
+| Public models/adapters, logs, datasets | Hugging Face [model collection](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac) and [dataset collection](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812) |
+| Reproducible GitHub write-up | This README, [technical report](docs/TECHNICAL_REPORT.md), [dataset method](docs/DATASET_METHOD.md), notebooks and provenance |
+| Responsible deployment decision | Task improvement gate evaluated separately from authorization/safety gate, which remains **HOLD** |
+
+This matrix describes the **published technical submission**. Completing the official hackathon form is the participant's final submission action.
 
 ## Repository navigation
 
-- [Technical report](docs/TECHNICAL_REPORT.md): design, methods, quantified evidence, safety and threats to validity.
-- [Reproducibility](docs/REPRODUCIBILITY.md): environment, source lineage and practical steps.
-- [Artifact manifest](docs/ARTIFACTS.md): original experiment ZIPs, weights, seeds and provenance.
-- [Results](results/README.md): compact verified result tables.
-- [Offline verification script](scripts/verify_archived_results.py): recompute exact counts from source archives.
-- [Audited dataset creation and provenance](docs/DATASET_METHOD.md): seeded simulator generation, frozen learner rollouts, observation-conditioned labeling, matched controls, exact split and training hashes, and caveats.
-- [SW17 fixed-controller results](docs/SW17_RESULTS.md): 31/80 frozen → 65/80 after each v4 fine-tuning arm; matched rehearsal tie; 8 unsafe proposals per v4 arm, so **not deployable**.
-- [Hugging Face dataset card](datasets/HF_DATASET_CARD.md): intended uses, generation, row counts, provenance and limitations.
-- [Hugging Face publishing notebook](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb): uploads existing SW12 v3 and SW17 v4 adapters plus the exact audited SW12/SW17 training datasets and traces; **does not train**.
-- [Submission checklist](SUBMISSION_CHECKLIST.md): final public-link and form gate.
+- [Technical report](docs/TECHNICAL_REPORT.md) · [SW17 result analysis](docs/SW17_RESULTS.md) · [Dataset construction](docs/DATASET_METHOD.md)
+- [Complete notebook sources](notebooks/) · [Reproduction steps](docs/REPRODUCIBILITY.md) · [Artifact provenance](docs/ARTIFACTS.md) · [Checks](SUBMISSION_CHECKLIST.md)
+- [Offline result verification](scripts/verify_archived_results.py) · [Anonymous Hugging Face verification](scripts/verify_hf_public_release.py)
+- [Final abstract (under 500 words)](submission/ABSTRACT.md)
 
-**Acknowledgment:** Built for the [LEXSI AI Safety & Alignment Hackathon](https://hackathon.lexsi.ai/) using the Cohere open-weight model ecosystem, AgentTune, AuditKIT, TRL, PEFT, and the Hugging Face Hub. No claim is made that the two LEXSI libraries by themselves perform the LoRA optimization.
-
-**AI assistance disclosure:** ChatGPT assisted with experimental coding, analysis, documentation and release packaging. The human participant is responsible for evaluating the evidence, approvals, and submission.
+**Acknowledgments and attribution.** Developed for the [LEXSI AI Safety & Alignment Hackathon](https://hackathon.lexsi.ai/) in the Cohere Labs open-weights ecosystem. LEXSI **AgentTune** and **AuditKIT** are actual runtime/evaluation dependencies; **TRL/PEFT** carry out the supervised LoRA parameter updates. ChatGPT assisted with coding, analysis, source documentation and release packaging; the participant is responsible for experimental decisions and the final submission.
