@@ -1,18 +1,23 @@
 # Submission abstract (under 500 words)
 
-**ShadowWork-SHIFT: Self-Healing Stateful Tool Agents with Learned Adaptation and Evidence-Grounded Recovery**
+**ShadowWork-SHIFT: Learning to Self-Heal Stateful Tool Agents with Verifiable Recovery**
 
-Tool-using agents can misinterpret acknowledged-but-unpersisted writes, stale observations, concurrent write conflicts and insufficient verification as task completion. ShadowWork-SHIFT implements a measured self-healing pipeline for LEXSI Track 3, Problem 8, with a Cohere Tiny Aya-derived custom checkpoint, AgentTune tool execution, AuditKIT episode verification, actual TRL/PEFT LoRA fine-tuning, and explicit authorization and redeployment gates.
+**Headline: 31/80 → 65/80 strict successes (+42.5 percentage points) after fine-tuning, with the controller held fixed.**
 
-We generate executable, synthetic SQLite maintenance workflows with predefined fault schedules and policy constraints; precommit train/development/sealed task IDs and SHA-256 hashes; collect actual frozen-learner tool traces on training tasks; label learner-visited failure states using a scripted observation-based reference policy; replay histories and verify reference trajectories against persisted state; and build equal-budget corrective and matched-rehearsal training datasets. The original training JSONLs, task generators, decision traces, evaluation evidence and honest dataset card are released for reproducibility. Reference labels are **programmatic**, not independently human-annotated.
+Tool-using AI agents often fail in ways ordinary answer-based benchmarks miss: a successful-looking write that never persists, a stale read, an expired lease, a misleading commit receipt, or an unauthorized state change. **ShadowWork-SHIFT** builds an end-to-end, evidence-grounded self-healing agent pipeline for **LEXSI Track 3, Problem 8** using a **Cohere Tiny Aya-derived open-weights checkpoint**, **LEXSI AgentTune** for stateful ReAct tool execution, **LEXSI AuditKIT** for agent-episode verification, and **TRL/PEFT** for actual LoRA fine-tuning.
 
-SW12's precommitted shifted-protocol 64-task comparison gave **24/64** strict success for frozen SW09 corrective, **46/64** for corrective v3 and **47/64** for matched rehearsal v3 under the same evaluation setup. SW17 then used a new precommitted 80-task suite with an identical four-read bootstrap and **no additional repair controller**. Frozen SW09 scored **31/80**, corrective v4 **65/80**, and equal-budget rehearsal v4 **65/80**. Corrective fine-tuning gained **34/80 successes (+42.5 percentage points)** over its frozen starting model (38 paired wins, four losses, exact McNemar `p=5.65e-8`); corrective and rehearsal were tied (five wins and five losses; `p=1`). The conclusion is **demonstrated learned adaptation**, not demonstrated superiority of learner-state correction over ordinary rehearsal.
+Our pipeline (1) generates executable, fault-injected SQLite maintenance tasks, (2) collects frozen-agent tool trajectories, (3) identifies learner-visited decisions requiring repair, (4) constructs reference-labeled corrective training examples, (5) fine-tunes two matched adapters, and (6) evaluates durable state, verification evidence, authorized behavior, and deployment gates. Training rows and task splits are precommitted with SHA-256 hashes and published alongside per-episode traces and model weights.
 
-The evaluation also exposed a vital safety limitation: **both v4 policies made eight unsafe mutation proposals in total across the eight authorization-forbidden SW17 tasks**, causing 0/8 strict successes per v4 arm in that group. The simulator's authorization gate blocked those attempts; they were not permitted tool mutations. Consequently, **the deployment decision is HOLD**, despite the significant learning gain. All tasks remain synthetic and related; no independent production-transfer or universal safety claim is made.
+**Crucially, we isolate training from runtime controller engineering.** In SW17, both new v4 adapters start from the same frozen SW09 model, receive **800 training rows and 80 optimizer steps each**, and face the **same 80 sealed tasks** under the identical four-read bootstrap with **no extra post-read repair controller**. The frozen model succeeds on **31/80 (38.75%)**, while corrective v4 reaches **65/80 (81.25%)**: **38 paired wins, four losses, exact McNemar p = 5.65 × 10⁻⁸**. Matched expert rehearsal also reaches **65/80**. This strengthens the central finding, **measurable improvement from learned model adaptation**, while the paired control accurately limits claims about any uniquely superior training curriculum. A separate SW12 protocol-shift experiment independently records **24/64 → 46/64** for corrective v3.
 
-**Track:** 3 (Agentic fine-tuning). **Problem:** 8 (Self-healing agents).  
-**Code:** https://github.com/githubshaurya/ShadowWork-SHIFT  
-**Dataset construction:** https://github.com/githubshaurya/ShadowWork-SHIFT/blob/main/docs/DATASET_CONSTRUCTION.md  
-**Full write-up:** https://github.com/githubshaurya/ShadowWork-SHIFT/blob/main/docs/TECHNICAL_REPORT.md
+Our system treats evaluation as a deployment decision, not merely a leaderboard number. SW17 detects eight forbidden-action proposals per v4 arm; its executable authorization gate blocks them, and the deployment decision remains **HOLD**, even when the learning-improvement gate passes. This is an explicit, inspectable defense rather than an unsupported safety claim.
 
-*Release status: verify the final SW12+SW17 public Hugging Face model/data uploads and both collections before entering their links in the official submission form.*
+**All key artifacts are public**: the exact custom model base, trained v3/v4 LoRA adapters, matched training datasets, learner rollouts, sealed evaluation trajectories, audit scorecards, generation methodology, and notebooks.
+
+**Track:** 3 · **Problem:** 8 · **SDKs:** AgentTune + AuditKIT · **Training:** TRL/PEFT LoRA
+
+**Model collection:** https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac
+
+**Dataset collection:** https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812
+
+**GitHub and full write-up:** https://github.com/githubshaurya/ShadowWork-SHIFT
