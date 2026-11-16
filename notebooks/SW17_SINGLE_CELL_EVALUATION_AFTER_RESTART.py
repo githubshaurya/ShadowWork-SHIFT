@@ -12,6 +12,7 @@ from accelerate import notebook_launcher
 
 BASE_CHECKPOINT = Path("/kaggle/input/datasets/shaurya466/shift-plain/shadowork_123")
 STARTING_ADAPTER = Path("/kaggle/input/datasets/shaurya466/shadowwork-09-learner-corrective-adapter/ShadowWork_09_learner_corrective_LoRA_adapter")
+SW12_ROOT = Path("/kaggle/input/datasets/shaurya4667/shadowwork-12-closed-loop")
 OUTPUT = Path("/kaggle/working/shadowwork/17_training_attribution")
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
@@ -367,6 +368,7 @@ assert precommit["starting_adapter"] == EXPECTED_ADAPTER_DIGEST
 assert precommit["max_actions"] == MAX_ACTIONS
 assert precommit["fixed_controller"] == "four_read_bootstrap_only"
 assert precommit["external_benchmark"] is False
+assert precommit["groups"] == GROUPS
 
 sealed_bytes = sealed_path.read_bytes()
 split_sha = {"sealed": hashlib.sha256(sealed_bytes).hexdigest()}
@@ -630,6 +632,12 @@ for split in splits_to_evaluate:
         folder = EVAL_DIR / split / policy
         folder.mkdir(parents=True, exist_ok=True)
 
+# Cache adapter hashes: avoid rehashing 120 MB for every task.
+evaluation_adapter_hashes = {
+    policy: sha256(adapter_dir / "adapter_model.safetensors")
+    for policy, adapter_dir in POLICIES.items()
+}
+
 def evaluation_complete():
     for split in splits_to_evaluate:
         tasks = dev_tasks if split == "dev" else sealed_tasks
@@ -637,7 +645,7 @@ def evaluation_complete():
             folder = EVAL_DIR / split / policy
             if len(list(folder.glob("*.json"))) != len(tasks):
                 return False
-            adapter_hash = sha256(POLICIES[policy] / "adapter_model.safetensors")
+            adapter_hash = evaluation_adapter_hashes[policy]
             for task in tasks:
                 identity = digest({
                     "task": task, "policy": policy,
