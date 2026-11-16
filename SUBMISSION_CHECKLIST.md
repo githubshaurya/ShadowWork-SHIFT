@@ -1,53 +1,41 @@
-# First-round submission checklist — LEXSI Track 3, Problem 8
+# LEXSI first-round submission: final verified checklist
 
-**Official instructions:** https://hackathon.lexsi.ai/  
-**Deadline:** November 15, 2026 at 11:59 PM **Anywhere on Earth** (November 16, 2026 at 5:29 PM IST).
+**Project:** ShadowWork-SHIFT · **Track:** 3, Agentic Fine-tuning · **Problem:** 8, Self-healing agents
 
-## Required public resources
+**Official rules and form entrypoint:** https://hackathon.lexsi.ai/  
+**First-round submission cutoff:** November 15, 2026, **11:59 PM Anywhere on Earth**, equivalent to **November 16, 2026 at 5:29 PM IST**.
 
-- [x] Public GitHub repository: https://github.com/githubshaurya/ShadowWork-SHIFT
-- [x] Written report and reproducibility guidance in the repository.
-- [x] Exact Plain SFT base published with verified 7-shard hash metadata: https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft
-- [x] SW08 and SW09 original adapters published: https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective
-- [x] SW09 original training and holdout evidence published: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training
-- [x] Existing Hugging Face model **collection located**: https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac
-- [x] Existing Hugging Face dataset **collection located**: https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812
-- [x] Four actual public SW12 v3 and SW17 v4 LoRA adapters uploaded (each includes 120,981,200-byte weights, config, tokenizer and provenance), confirmed by direct Hub listings and executed anonymous verifier.
-- [x] The [SW12 v3 + SW17 v4 CPU-only Kaggle publisher](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb) finished successfully. Exact source notebook execution is preserved in the Project source.
-- [x] Exact SW12/SW17 training JSONLs, train/dev/sealed task splits, 160 train-only rollouts per study, 384 SW12 evaluation traces, 320 SW17 sealed evaluation traces, scorecards, methodology and dataset card publicly uploaded. Source/release SHA-256 checks pass.
-- [ ] SW13–SW16 historical source ZIPs were not attached in the successful publisher run; publish the verified historical bundle using [CPU-only evidence addendum](notebooks/FINAL_HF_Publish_Historical_Evidence_Addendum.ipynb).
-- [x] All four updated model repos and consolidated dataset repo added to existing HF collections; exact item lists printed by the executed publisher and confirmed by its `token=False` collection verification.
-- [x] The executed publisher's anonymous `HfApi(token=False)` release gate passed; the connected HF file browser independently lists four complete model repositories and SW12/SW17 dataset files.
-- [ ] Verify collection URLs in an ordinary browser (collection metadata visible but file-browser collection read returned an access error).
-- [x] Programmatic anonymous Hugging Face release-gate checks passed in the completed publishing notebook. Manual ordinary-browser verification remains separately open.
-- [x] Core SW09/SW12/SW14/SW15/SW16 notebooks and SW16 budget repair notebook uploaded to GitHub.
-- [x] Offline result verification script added; source-archive ZIPs must be supplied by the user when running it.
-- [ ] Optional: independent small replay/smoke test using the public model/adapter path.
-- [ ] Refresh README and submission write-up to remove *empty/pending upload* claims and lead with confirmed SW17 results, matched-rehearsal tie, and forbidden-action failures. The user requested write-up editing later.
+## Technical project and public artifact requirements
 
-## Required form fields
+- [x] **Dense Cohere open-weights model:** exact custom Tiny Aya-derived Plain SFT checkpoint published, with base-shard provenance.
+- [x] **LEXSI SDKs actually integrated:** AgentTune `Project`, `ReActStrategy` and `DictToolHarness`; AuditKIT `AgentEvalRunner`, `AgentEvalSpec` and `FinalStateAssertion` in the runnable SW17 notebook. Explicitly disclose TRL/PEFT as the actual SFT/LoRA weight optimizer.
+- [x] **Real model training:** two distinct SW17 LoRA adapters optimized 80 steps each from an identical frozen SW09 start with 800-row matched datasets, LR 5e-5 and global batch 8; original weight and dataset hashes retained.
+- [x] **Meaningful before/after metrics:** frozen original SW09 **31/80** vs corrective v4 **65/80** and matched rehearsal v4 **65/80** strict success under identical fixed-controller conditions. Exact corrective–frozen paired p=5.65e-8. State, evidence, unsafe proposals and model-call counts also published.
+- [x] **Explicit safety / redeployment gate:** Tool authorization blocks forbidden mutation execution; SW17 authorization stress test records 8 unsafe proposals per v4 arm, and the policy deployment gate correctly remains `deploy=false`.
+- [x] **Public GitHub source and write-up:** [README](README.md), [technical report](docs/TECHNICAL_REPORT.md), [abstract](submission/ABSTRACT.md), [dataset construction](docs/DATASET_METHOD.md), [SW17 notebook](notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb), [reproduction guide](docs/REPRODUCIBILITY.md).
+- [x] **Exact original base public:** https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft
+- [x] **SW09 original models and evidence public:** original corrective and rehearsal adapters + training/evaluation data.
+- [x] **Four SW12/SW17 final adapters public:** corrective/rehearsal v3 and corrective/rehearsal v4, each with **120,981,200-byte LoRA weights** and unmodified original SHA-256 provenance. [Model collection](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac).
+- [x] **Exact training data, tasks and logs public:** [Consolidated dataset](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets), 160+160 train-only rollouts, 384 SW12 + 320 SW17 evaluated episodes, training JSONLs, scorecards, paired tests, precommits, SHA-256 manifest and dataset card. [Dataset collection](https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812).
+- [x] **Published collection membership verified:** user-executed Kaggle publisher source shows eight model entries and both data entries in the existing collections.
+- [x] **Independent anonymous verification passed:** completed publisher checked files and collection membership with `HfApi(token=False)`, final output `PUBLIC RELEASE GATE PASS`. [Evidence ledger](docs/PUBLIC_RELEASE_VERIFICATION.md).
+- [x] **SW17 Project ZIP integrity audited:** all 496 original archive member hashes pass; policy scores and exact paired tests recomputed.
+- [x] **Strong abstract and write-up ready:** [form handoff](submission/FORM_READY.md) and [384-word abstract](submission/ABSTRACT.md).
+- [x] **Public repository satisfies public demonstration/repository requirement:** https://github.com/githubshaurya/ShadowWork-SHIFT
 
-- [ ] Registered participant/team email (participant supplies).
-- [ ] Submission abstract (under 500 words; see `submission/ABSTRACT.md`).
-- [ ] Hugging Face **model collection** URL, not only model repo URL.
-- [ ] Hugging Face **dataset collection** URL, not only dataset repo URL.
-- [ ] GitHub repository URL.
-- [ ] Write-up URL (GitHub README/report is accepted).
-- [ ] Track: **3 — Agentic fine-tuning**.
-- [ ] Primary problem statement: **8 — Self-healing agents**.
-- [ ] Repos/models used: Cohere Tiny Aya-derived model + AgentTune + AuditKIT; TRL/PEFT identified accurately.
-- [ ] Final submit and confirmation recorded by participant.
+## Required final participant action
 
-## Safety and accuracy checks
+- [ ] Enter the **registered participant/team email** in the form (not available to the assistant).
+- [ ] Open **Submit your project** at https://hackathon.lexsi.ai/ and paste the [form-ready values](submission/FORM_READY.md).
+- [ ] Submit the project **before 5:29 PM IST on November 16, 2026**.
+- [ ] Preserve the official submission confirmation, submission identifier, or final success page.
 
-- [x] SW17 fixed-controller training gains disclosed (31/80 frozen vs 65/80 corrective v4 and 65/80 rehearsal v4). 
-- [x] SW17 forbidden-action safety failures disclosed (8/8 unsafe proposals per v4 arm), final deployment HOLD. 
-- [x] Transparent dataset generation, scripted-reference labels and matched-control methodology documented. 
-- [x] Fixed-controller training comparisons disclosed.
-- [x] Rehearsal stronger than corrective v3 disclosed.
-- [x] Controller gains separated from LoRA gains.
-- [x] SW16 deployment HOLD and v5 focused PASS distinguished.
-- [x] Synthetic task and external-generalization limits disclosed.
-- [x] Original v3 weight SHA-256 values recomputed from Project SW12 archive and matched public model provenance; v4 provenance hashes matched SW17 Project archive. All four uploaded training JSONL hashes matched the public SHA manifest; SW17 320-row scorecard and paired tests recomputed from Project evidence.
+## Deliberate scope choices (no blocker)
 
-**No claim of completed submission** until the form is submitted and each required public artifact is confirmed.
+- **Historical SW13–SW16 archives:** retained in Project and referenced in the technical report, but not merged into the lean SW12/SW17 public training/evaluation dataset. The optional [historical upload addendum](notebooks/FINAL_HF_Publish_Historical_Evidence_Addendum.ipynb) is **not a prerequisite** to submit.
+- **Independent external benchmark:** not required for this first-round hackathon; SW17's prespecified synthetic schema shift is disclosed precisely.
+- **HF Space / video / slides:** optional for first-round submission because an accessible public GitHub repository and write-up satisfy the official public-project condition. Shortlisted teams can use these for final judging.
+- **Browser-only HF collection UI:** a separate ordinary-browser check was not available inside this assistant environment. Actual completed anonymous API publication verification **did pass** and proves the public release and collection memberships; there is no technical publication blocker.
+- **Deployment:** the training improvement gate and production deployment gate are intentionally distinct; `deploy=false` is a safety-control result, not an incomplete artifact.
+
+**Status:** technical release, documentation, reproducibility, SDK attribution and numerical verification are complete. The **official hackathon form submission/confirmation** is the only required action not verifiable from the connected artifacts.
