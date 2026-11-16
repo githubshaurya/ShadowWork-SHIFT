@@ -4,7 +4,7 @@
 
 ## 1. Publication evidence from the executed Kaggle notebook
 
-The completed user-executed Kaggle publisher was preserved in Project sources as `notebookc285845831 (1).ipynb`. It has no Python error outputs; code execution cells 1, 3, 5, 7, 9 and 11 completed in sequence. Its final `HfApi(token=False)` verification cell printed:
+The completed user-executed Kaggle publisher was preserved in Project sources as `notebookc285845831 (1).ipynb`; its publication logic is available in the [GitHub publication notebook](../notebooks/FINAL_HF_Publish_From_Kaggle.ipynb). It has no Python error outputs; code execution cells 1, 3, 5, 7, 9 and 11 completed in sequence. Its final `HfApi(token=False)` verification cell printed:
 
 > PUBLIC RELEASE GATE PASS: four model adapters, exact training data, two collections, episode evidence, and dataset method visible without login.
 
@@ -67,7 +67,7 @@ The public `sw12/` directory contains **558 files**: 160 train-only learner roll
 - **Main code and report:** https://github.com/githubshaurya/ShadowWork-SHIFT
 - **Anonymous release-verifier script:** https://github.com/githubshaurya/ShadowWork-SHIFT/blob/main/scripts/verify_hf_public_release.py
 
-The **programmatic anonymous Hugging Face collection membership checks passed** in the actual publisher. A separate browser-based collection UI test was not available from this assistant environment; it is **not necessary to repeat the already-successful anonymous API test** to establish public artifact presence. The official hackathon form submission remains a separate user action, and this document makes no claim that it has been submitted.
+The **programmatic anonymous Hugging Face collection membership checks passed** in the completed publisher run. These are recorded API checks; an independent graphical-browser check of the collection pages was not part of that audit. The participant subsequently confirmed receipt of the first-round hackathon form, documented separately in the [submission checklist](../SUBMISSION_CHECKLIST.md).
 
 ## 6. Reproducible data-quality and score verification
 
