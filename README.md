@@ -9,7 +9,7 @@ ShadowWork-SHIFT is an experimental pipeline for **LEXSI.ai's AI Safety & Alignm
 
 The pipeline detects and diagnoses failing runs, uses learner-visited states and verified corrective continuations for LoRA adaptation, evaluates policies against matched rehearsal controls, and gates recovery changes on strictly checked persisted state and task evidence. **AgentTune** is used for agent execution and tool harnesses, with **AuditKIT** for evaluation and diagnostics. LoRA optimization uses **TRL/PEFT**, not a claim that AgentTune natively performed those weight updates.
 
-> **Status:** Experimental research prototype, *not production certified*. The exact custom Plain SFT base and three SW08/SW09 adapters, SW09 training traces, and 70-case holdout evidence were published previously; SW12 corrective/rehearsal v3 adapters and SW12–SW16 evidence are in the publication pipeline and must be verified before submission.
+> **Status:** Experimental research prototype, *not production certified*. The exact custom Plain SFT base and three SW08/SW09 adapters, SW09 training traces, and 70-case holdout evidence were published previously; SW12 v3 and SW17 v4 adapters, plus SW12–SW17 exact data and evidence, are in the final publication pipeline; verify actual uploaded files before submission.
 
 ## Results at a glance
 
@@ -44,6 +44,21 @@ SW12 v3 used equal-sized training arms, initialized from the same original SW09 
 Thus there is real **adaptation benefit holding the controller fixed**, but **not demonstrated superiority of failure-specific corrective labels over ordinary matched rehearsal**.
 
 **Focused SW16 budgeted_v5 repair (320 model-task episodes, two v3 adapters):** Corrective v3 **156/160** strict; rehearsal v3 **160/160**; **316/320** combined strict successes and **320/320** correct persisted states. Relative to unified_v4, exactly two corrective-v3 strict failures were repaired, with zero losses, but each one-case improvement has exact paired `p=1` and **is not statistically significant**. No forbidden state mutations were executed in these recorded runs. The notebook's local gate was `PASS_FOCUSED_ENGINEERING_REGRESSION`; this is **not external deployment certification**.
+
+### SW17 fixed-controller model-learning comparison (80 sealed tasks)
+
+| Policy | Strict success | Final state correct | Unsafe mutation proposals |
+|---|---:|---:|---:|
+| Frozen original SW09 corrective | 31/80 (38.75%) | 58/80 | 6 |
+| Corrective v4, 80-step continued training | **65/80 (81.25%)** | 77/80 | 8 |
+| Matched rehearsal v4, same training budget | **65/80 (81.25%)** | 80/80 | 8 |
+| Previously trained rehearsal v3 (additional baseline) | 57/80 (71.25%) | 75/80 | 2 |
+
+**Training attribution:** corrective v4 improves by **34/80 tasks (+42.5 percentage points)** versus the frozen starting adapter with the same four-read bootstrap and *no additional repair controller*. Paired: 38 wins, 4 losses, exact McNemar `p=5.65e-8`. Rehearsal v4 is identically successful: 5 wins and 5 losses versus corrective v4, exact `p=1`. This establishes **fine-tuning gains**, not special corrective-curriculum superiority.
+
+**Important SW17 safety failure:** both v4 arms had **8/8 unsafe mutation proposals** and **0/8 strict success** in the `injected_forbidden` group. The synthetic runtime blocked unauthorized mutations, but **the policies themselves are not safe to deploy**. Original frozen SW09 had 6 unsafe proposals in that group; previous rehearsal v3 had 2. The SW17 notebook's `PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` is a *learning-evidence gate*, **not** a deployment pass; `deploy=false`. No independent external benchmark is claimed.
+
+**Transparent data creation:** See [dataset construction and provenance](docs/DATASET_CONSTRUCTION.md) and [publication-ready Hugging Face dataset card](docs/HF_DATASET_CARD.md) for fully synthetic generation, actual train-only learner rollouts, scripted reference labeling, matched 800-row curricula and original split/hash evidence. The new CPU-only [SW12+SW17 publishing notebook](notebooks/FINAL_HF_Publish_SW12_SW17_From_Kaggle.ipynb) publishes all four pre-trained LoRA adapters and dataset artifacts without any training.
 
 For full cohort definitions, controller attribution, failure taxonomy and limitations, see [Technical report](docs/TECHNICAL_REPORT.md).
 
@@ -95,9 +110,9 @@ See [Reproduction guide](docs/REPRODUCIBILITY.md) for dependencies, frozen check
 - [Original corrective adapter](https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective) and [matched SW09 rehearsal adapter](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-bc)
 - [Original SW09 training data and audited holdout traces](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training)
 - [SW12 corrective v3 repository (empty until upload)](https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v3) and [SW12 rehearsal v3 repository (empty until upload)](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v3)
-- [SW12–SW16 evidence repository (pending upload)](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets)
+- [SW12–SW17 training/evidence repository (pending upload)](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets)
 
-**Important:** Both public collections existed before this GitHub release; the v3 models and latest datasets are not yet populated. Follow the [Kaggle publishing notebook](notebooks/FINAL_HF_Publish_From_Kaggle.ipynb) and independently verify public collection membership and read access before submitting.
+**Important:** Both public collections existed before this GitHub release; the v3 models and latest datasets are not yet populated. Follow the [updated SW12+SW17 Kaggle publishing notebook](notebooks/FINAL_HF_Publish_SW12_SW17_From_Kaggle.ipynb) and independently verify public collection membership and read access before submitting.
 
 ## Main limitations
 
