@@ -32,11 +32,11 @@
 
 ## Deliberate scope choices (no blocker)
 
-- **Historical SW13–SW16 archives:** retained in Project and referenced in the technical report, but deliberately not merged into the lean SW12/SW17 public training/evaluation dataset. No separate historical upload is required.
+- **Historical SW13–SW16 archives:** retained in Project and described in the technical report but not included in the consolidated HF dataset. The core SW17 learning audit is complete; however, the official rule to host **all** created logs makes archiving these earlier traces on HF the conservative option for literal-completeness assurance. Keep them in an isolated `historical/` subdirectory or separate historical dataset if published.
 - **Independent external benchmark:** not required for this first-round hackathon; SW17's prespecified synthetic schema shift is disclosed precisely.
 - [x] **Hugging Face cleanup verified:** the public dataset card is byte-for-byte identical to the canonical GitHub card, with the finalized SW17 results; the empty placeholder `i-am-shaurya05/shadowwork-shift-models` no longer exists. Core model adapters, datasets, and both collections remain intact.
 - **HF Space / video / slides:** optional for first-round submission because an accessible public GitHub repository and write-up satisfy the official public-project condition. Shortlisted teams can use these for final judging.
 - **Browser-only HF collection UI:** a separate ordinary-browser check was not available inside this assistant environment. Actual completed anonymous API publication verification **did pass** and proves the public release and collection memberships; there is no technical publication blocker.
 - **Deployment:** the training improvement gate and production deployment gate are intentionally distinct; `deploy=false` is a safety-control result, not an incomplete artifact.
 
-**Status:** technical release, documentation, reproducibility, SDK attribution and numerical verification are complete. The **official hackathon form submission/confirmation** is the only required action not verifiable from the connected artifacts.
+**Status:** the **primary** model/data release, GitHub write-up, LEXSI SDK integration and numerical SW17 audit are complete. The only unconfirmed **mandatory participant action** is the official submission form. Optional release polish: synchronize HF's older mirrored `DATASET_METHOD.md` with the newly audited GitHub method; publish historical SW13–SW16 logs on HF to avoid any strict-reading ambiguity in the organizer's all-artifacts rule. A full fresh-environment GPU rerun has not been independently performed in this audit.
