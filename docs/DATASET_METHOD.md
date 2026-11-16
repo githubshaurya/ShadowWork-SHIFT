@@ -93,7 +93,7 @@ For evaluation, every policy encounters the same **80 precommitted sealed tasks*
 | Corrective v4 trained adapter SHA-256 | `ebf7ed229641faf882f51d55c8aa0a12be748984cb7370d1399c236ab38bbff3` |
 | Rehearsal v4 trained adapter SHA-256 | `36e4f7b0686029465899d2931bb15deaf95e77f310da2f9c8f57a29996f74b99` |
 
-These are **original experimental commitments**, reproduced from the saved evidence archive and reflected in the public release. Strict task and exact-ID leakage checks were performed. Because the synthetic generator and task grammar are related across splits, **this does not amount to near-duplicate-proof or independent production-distribution testing**.
+These are **original experimental commitments**, reproduced from the saved evidence archive and reflected in the public release. To audit the exact public artifacts directly, use the [CPU-only SW17 public evidence verifier](../scripts/verify_sw17_public_evidence.py). Strict task and exact-ID leakage checks were performed. Because the synthetic generator and task grammar are related across splits, **this does not amount to near-duplicate-proof or independent production-distribution testing**.
 
 ## Dataset fields and reproducibility
 
