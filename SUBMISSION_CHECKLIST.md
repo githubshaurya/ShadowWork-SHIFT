@@ -25,10 +25,8 @@
 
 ## Required final participant action
 
-- [ ] Enter the **registered participant/team email** in the form (not available to the assistant).
-- [ ] Open **Submit your project** at https://hackathon.lexsi.ai/ and paste the [form-ready values](submission/FORM_READY.md).
-- [ ] Submit the project **before 5:29 PM IST on November 16, 2026**.
-- [ ] Preserve the official submission confirmation, submission identifier, or final success page.
+- [x] **Official submission received:** participant provided the LEXSI confirmation screen with “Submission received!” after completing the registration, abstract, artifact and Track 3 fields.
+- [x] **Confirmation captured in the conversation.** Retain the emailed confirmation and Discord contact details privately; do not publish personal identifiers in the repository.
 
 ## Deliberate scope choices (no blocker)
 
@@ -39,4 +37,4 @@
 - **Browser-only HF collection UI:** a separate ordinary-browser check was not available inside this assistant environment. Actual completed anonymous API publication verification **did pass** and proves the public release and collection memberships; there is no technical publication blocker.
 - **Deployment:** the training improvement gate and production deployment gate are intentionally distinct; `deploy=false` is a safety-control result, not an incomplete artifact.
 
-**Status:** the **primary** model/data release, GitHub write-up, LEXSI SDK integration and numerical SW17 audit are complete. The only unconfirmed **mandatory participant action** is the official submission form. Optional release polish: synchronize HF's older mirrored `DATASET_METHOD.md` with the newly audited GitHub method; publish historical SW13–SW16 logs on HF to avoid any strict-reading ambiguity in the organizer's all-artifacts rule. A full fresh-environment GPU rerun has not been independently performed in this audit.
+**Status:** first-round submission **received**, and the **primary** model/data release, GitHub write-up, LEXSI SDK integration and SW17 numerical audit are complete. Public release integrity polish remains separate from the form submission: the updated Hugging Face dataset README needs a refreshed SHA-256 manifest entry; the older HF dataset-method mirror should be updated; and adding SW13–SW16 historical logs to HF would satisfy the strictest interpretation of the organizer's all-artifacts rule. Optional release polish: synchronize HF's older mirrored `DATASET_METHOD.md` with the newly audited GitHub method; publish historical SW13–SW16 logs on HF to avoid any strict-reading ambiguity in the organizer's all-artifacts rule. A full fresh-environment GPU rerun has not been independently performed in this audit.
