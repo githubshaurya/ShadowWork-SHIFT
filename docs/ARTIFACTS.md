@@ -1,79 +1,79 @@
-# Artifact inventory and provenance
+# Public artifact inventory and provenance
 
-This inventory separates **source notebooks**, **trained weights**, **training/benchmark datasets**, and **evidence archives**. A ZIP being present in Project/Kaggle is *not* proof that it is already publicly downloadable.
+All **core ShadowWork-SHIFT experiment deliverables are published**: exact model base, trained adapters, SW09/SW12/SW17 training data, split commitments, auditable agent trajectories, scored task records, methodology and source notebooks. This document distinguishes the core public release from the separately archived SW13–SW16 engineering history.
 
-## Checkpoint lineage
+## Model lineage: original training start must be preserved
 
-```
-Cohere Tiny Aya-derived custom Plain SFT (~3.35B, full checkpoint)
-  (Kaggle input: shaurya466/shift-plain/shadowork_123)
-  |
-  +--> Oracle BC v2 LoRA
-          |
-          +--> SW09 learner-state corrective LoRA (original corrective)
-                  |
-                  +--> SW12 learner-corrective v3 LoRA
-                  |
-                  +--> SW12 matched rehearsal v3 LoRA
-          |
-          +--> SW09 on-policy/rehearsal BC comparator
+```text
+Exact custom Cohere Tiny Aya-derived Plain SFT full checkpoint
+  └── SW08 Oracle BC v2 adapter
+       ├── SW09 learner-corrective adapter  [frozen start for v3 and v4]
+       │    ├── SW12 corrective v3
+       │    ├── SW12 rehearsal v3
+       │    ├── SW17 corrective v4
+       │    └── SW17 rehearsal v4
+       └── SW09 ordinary rehearsal baseline
 ```
 
-**Caution:** Original archive configs reference **local Kaggle** base paths. The publicly released SW08/SW09 adapter configs now point to the exact already-public custom base; SW12 v3 configs must be rewritten *as metadata only* during their pending release. Verify tokenizers and original weight hashes. Do not silently substitute a generic Tiny Aya base.
+**Important:** Adapter config metadata in the published repos references the **exact public custom base** at `i-am-shaurya05/shadowwork-shift-plain-sft`. The original Kaggle-local config values remain under `provenance/original_adapter_config.json` and the LoRA tensors themselves were not changed by publication.
 
-## Primary archived sources
+## Hugging Face: verified public model files
 
-| Artifact | Contents | Status |
+| Release | Hub repository | Key public files |
 |---|---|---|
-| `ShadowWork_09_Kaggle_Input_Bundle.zip` | SW08 Oracle BC v2 adapter, prepared train-only source ZIP | Available in Project and on Kaggle; publication pending |
-| `ShadowWork_09_Learner_State_Verified_Recovery_Kaggle.ipynb` | Original embedded-data SW09 pipeline | Available source |
-| `ShadowWork_09_Kaggle_Extracted_Input_Ready.ipynb` | Final extracted-input SW09 training pipeline | Preferred runnable source |
-| `ShadowWork_09_learner_corrective_Adapter.zip` | SW09 original corrective LoRA weights and tokenizer | Available in Project; HF upload pending |
-| `ShadowWork_09_rehearsal_bc_Adapter.zip` | SW09 matched comparator | Available in Project; HF upload pending |
-| `ShadowWork_09_Final_Holdout_Evidence.zip` | 210 scored episodes + split commitments | Available in Project; HF upload pending |
-| `ShadowWork_12_Closed_Loop_Evidence.zip` | v3 corrective and rehearsal adapters, training rows, task splits, episode scores, manifests | Available in Project; HF upload pending |
-| `ShadowWork_13_Live_Results.zip` | Initial live controller evidence, scorecards, traces | Available in Project |
-| `ShadowWork_14_Controller_Repair_Results1.zip` | Fresh 128-task paired controller experiment | Available in Project |
-| `ShadowWork_15_Cross_Protocol_Recovery_Results.zip` | 70 SW09 + 80 SW12 new tasks and controller comparisons | Available in Project |
-| `ShadowWork_16_Unified_Recovery_Results.zip` | 1,096 evaluated episodes, SW09 retention + SW12 core/composed, deployment gate | Available in Project |
-| `ShadowWork_16_Budget_Regression_Results.zip` | 320 v5 episodes, paired_summary.csv, paired_task_results.csv, gate | Available in Project |
+| Full original Plain SFT checkpoint | [Base model](https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft) | Full sharded custom checkpoint |
+| SW08 Oracle BC v2 | [Parent LoRA](https://huggingface.co/i-am-shaurya05/shadowwork-shift-oracle-bc-v2) | Original adapter |
+| SW09 frozen corrective starting adapter | [SW09 corrective](https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective) | Original adapter |
+| SW09 rehearsal baseline | [SW09 rehearsal](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-bc) | Original comparator |
+| SW12 corrective v3 | [Corrective v3](https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v3) | 120,981,200-byte `adapter_model.safetensors`, config, tokenizer, provenance |
+| SW12 matched rehearsal v3 | [Rehearsal v3](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v3) | 120,981,200-byte adapter, config, tokenizer, provenance |
+| SW17 corrective v4 | [Corrective v4](https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v4) | 120,981,200-byte adapter, config, tokenizer, provenance |
+| SW17 matched rehearsal v4 | [Rehearsal v4](https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v4) | 120,981,200-byte adapter, config, tokenizer, provenance |
 
-Preferred rendered notebook names in GitHub should use descriptive `SW09_...`, `SW12_...` rather than the generic Kaggle download filename `notebook12903defcf*.ipynb`.
+**Model collection:** https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac
 
-## Prespecified identity and split checks
+Original SW17 v4 LoRA weight digests in `final_provenance.json`, matched against the publicly published `provenance/original_weights_sha256.txt` entries:
 
-- SW09 final holdout: 70 cases in seven 10-case failure groups; `holdout_sha256=1e13aa4d951ae1acdcc5d8ec9bdd43a3ec7e0897a0254aeff037e33ba9866197` as recorded in `holdout_commitment.json`.
-- SW12 source generator: seed `20261113`, max 22 actions; train/dev/sealed split hashes in `final_provenance.json`.
-- SW12 starting adapter digest: `680659a3c6fce48e18f4ce8087b3fbb2c5806d4427e90c2b5cc6c49a524bb441`; v3 training source hashes in per-arm `*_training_metadata.json`.
-- SW12 v3: 800 training rows per matched arm, 80 optimizer steps, LR `5e-5`, global batch 8.
+| Adapter | Exact SHA-256 |
+|---|---|
+| corrective v4 | `ebf7ed229641faf882f51d55c8aa0a12be748984cb7370d1399c236ab38bbff3` |
+| rehearsal v4 | `36e4f7b0686029465899d2931bb15deaf95e77f310da2f9c8f57a29996f74b99` |
 
-## Verified existing public artifacts and pending new uploads
+## Public datasets and executable evidence
 
-**Previously published on November 12, 2026:**
+**Dataset collection:** https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812
 
-- Exact full seven-shard Plain SFT base: https://huggingface.co/i-am-shaurya05/shadowwork-shift-plain-sft
-- Oracle BC v2 parent adapter: https://huggingface.co/i-am-shaurya05/shadowwork-shift-oracle-bc-v2
-- Original SW09 learner-state corrective: https://huggingface.co/i-am-shaurya05/shadowwork-shift-learner-corrective
-- Original SW09 matched rehearsal adapter: https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-bc
-- SW09 original training/holdout data, audit reports and simulator code: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training
-- Previously created model collection: https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-models-and-frozen-adapters-6af5c8a5a548fb703ab420ac
-- Previously created data collection: https://huggingface.co/collections/i-am-shaurya05/shadowwork-shift-training-data-and-audit-evidence-6af5c8a51d44c02ee6e19812
+**Consolidated SW12/SW17 dataset:** https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
 
-**Created Nov 15, pending model/data upload and final public verification:**
+| Dataset folder | Content published | Audit evidence |
+|---|---|---|
+| `sw12/` | 192 train, 32 dev, 64 sealed task specifications; 800-row corrective and 800-row rehearsal training JSONLs; 160 learner-visited train-only rollouts; 384 evaluated episode traces | `precommit.json`, `selection_audit.json`, `all_episode_scorecard.csv`, `grouped_summary.csv`, `*_training_metadata.json`, `final_provenance.json` |
+| `sw17/` | 240 train, 40 dev, 80 sealed task specifications; 800-row corrective v4 and 800-row rehearsal v4 JSONLs; 160 train-only learner rollouts; 320 sealed evaluated episodes across four policies | `precommit.json`, `selection_audit.json`, `episode_scorecard.csv`, `policy_summary.csv`, `paired_tests.csv`, `learning_gate.json`, `final_provenance.json` |
 
-- SW12 corrective v3 adapter: https://huggingface.co/i-am-shaurya05/shadowwork-shift-corrective-v3
-- SW12 rehearsal v3 adapter: https://huggingface.co/i-am-shaurya05/shadowwork-shift-rehearsal-v3
-- SW12–SW16 dataset and audited evidence: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets
-- Publishing source: [FINAL_HF_Publish_From_Kaggle.ipynb](../notebooks/FINAL_HF_Publish_From_Kaggle.ipynb)
+The same dataset root also contains `README.md` (public Hugging Face dataset card), `DATASET_METHOD.md` and `sha256_release_manifest.json`. The SW17 Project ZIP itself has **497 files** with **496 verified SHA-256 commitments** including its local manifest. Those scientific records agree with the public SW17 scorecard: original frozen SW09 **31/80**, corrective v4 **65/80**, rehearsal v4 **65/80**, earlier v3 rehearsal **57/80**.
 
-The seven base weight-shard hashes publicly documented in `provenance/base_checkpoint_shards_sha256.json` match the seven hashes independently present in SW09 final holdout `base_hashes.json`. Existing public collections are visible in account metadata; their browser access and final membership should still be verified independently.
+Original SW09 training and 70-task holdout evidence: https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-evidence-and-training
 
-## Integrity conventions
+For programmatic reproduction, see [DATASET_METHOD.md](DATASET_METHOD.md), [REPRODUCIBILITY.md](REPRODUCIBILITY.md) and [the anonymous public release verifier](../scripts/verify_hf_public_release.py).
 
-Retain the original evidence ZIPs in a `source_archives/` staging directory until checked; keep ZIP member names and SHA-256 checksums. Publish only curated, relevant artifacts, not redundant generated copies of identical tasks. Recompute metrics from exported episode JSONs and scorecards. No hand-entered data should replace raw traces for scientific verification.
+## Source notebooks and evidence archives
 
-## SW17 actual trained weights and data provenance (pending HF upload)
+| Source | What it demonstrates |
+|---|---|
+| [SW17 fixed-controller learning attribution](../notebooks/SW17_Fixed_Controller_Learning_Attribution_Kaggle.ipynb) | Actual AgentTune/AuditKIT tool execution, fixed task split, learner rollouts, matched labels and LoRA training, paired replay scoring |
+| [SW12 protocol-shift study](../notebooks/SW12_Closed_Loop_Adaptation.ipynb) | Synthetic protocol generation, v3 corrective vs rehearsal matched training, 64-task sealed evaluation |
+| [Final Hugging Face publisher](../notebooks/FINAL_HF_Publish_From_Kaggle.ipynb) | Uploads already-trained v3/v4 adapters and exact SW12/SW17 artifacts, with anonymous verification |
+| [SW17 result analysis](SW17_RESULTS.md) | 80-task outcome table, matched McNemar comparisons, final state and safety gate |
+| [Result archive verifier](../scripts/verify_archived_results.py) | CPU-only reproduction of historical task summaries and archived episode checks |
 
-SW17 continuation from the original SW09 corrective adapter completed both equal-budget training arms. Original 80-step rehearsal_v4 adapter saved first, then learner_corrective_v4 saved after recovery from a repeated DDP launch failure. Both training JSONLs contain 800 rows, share 400 original expert anchors, and record hashes in `*_training_metadata.json`. The sealed test was precommitted as 80 synthetic tasks across 10 groups. Under identical four-read bootstrap and no further repair controller: frozen SW09 31/80, corrective v4 65/80 and rehearsal v4 65/80 strict. **Both v4 arms made eight unsafe mutation proposals across the eight injected_forbidden tasks**, blocked by the simulator; do not claim deployment approval. See [dataset construction](DATASET_CONSTRUCTION.md) and [SW17 technical results](../results/README.md).
+Original Project-source archives retained separately: `ShadowWork_09_Final_Holdout_Evidence.zip`, `ShadowWork_12_Closed_Loop_Evidence.zip`, `ShadowWork_13_Live_Results.zip`, `ShadowWork_14_Controller_Repair_Results1.zip`, `ShadowWork_15_Cross_Protocol_Recovery_Results.zip`, `ShadowWork_16_Unified_Recovery_Results.zip`, `ShadowWork_16_Budget_Regression_Results.zip`, and `ShadowWork_17_Training_Attribution_Evidence.zip`. SW13–SW16 archives remain optional historical supplements rather than prerequisites for judging the fully public SW12/SW17 training claim.
 
-The CPU-only [final SW12+SW17 publisher](../notebooks/FINAL_HF_Publish_SW12_SW17_From_Kaggle.ipynb) is the preferred replacement for the earlier SW12-only publisher; it uploads **four actual LoRA adapters**, exact SW12+SW17 training/split/audit/trace records, the transparent HF dataset card and release SHA-256 manifest. **The new HF model/data repos remain pending until that notebook actually succeeds and public files are verified.**
+## Immutable experiment commitments
+
+- **SW09 original:** 70-case final holdout split and starting-adapter provenance, publicly released independently.
+- **SW12 v3:** seed `20261113`; 192/32/64 task split; 800 rows per arm, 80 optimizer steps, LR `5e-5`, global batch 8; original SW09 starting-adapter digest `680659a3c6fce48e18f4ce8087b3fbb2c5806d4427e90c2b5cc6c49a524bb441`.
+- **SW17 v4:** seed `20261115`; 240/40/80 split; 10 failure categories; 160 frozen starting-model train rollouts; each arm 400 shared anchors plus 400 differentiated rows, 800 total; 80 optimizer steps at the same LR/global batch; original SW09 starting-adapter digest identical to SW12.
+- **SW17 split SHA-256:** train `6b2f73c0a0500656b071ca107f217bf3f1b6acb238d33bec0d211bb33caa71df`, dev `6d812921273d236524dbbebacb5117840bb17d3645c27b78610122c92442e06e`, sealed `789c656e798913bb3a9dbe0e19ef937a665f1782d33298d7b24e95c9f30cdb12`.
+- **SW17 training JSONL SHA-256:** corrective `f52e2c97341107ec7ef14b9239781928d9aa3fadb37ec9b4d042a373d9a1b584`; rehearsal `1222b751f32b534031223050444d43d42dc1ba4a571474f5f6815698047eee3d`.
+
+These checks link **exact serialized training rows, original frozen task splits, saved trained tensors, and sealed outcomes** into one auditable release. The experiment remains within related synthetic task environments, and the recorded authorization gate still controls deployment.
