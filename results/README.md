@@ -80,3 +80,20 @@ Source: `ShadowWork_16_Budget_Regression_Results.zip/paired_summary.csv` and `de
 ## Interpretation rule
 
 **Never label 316/320 as 316 independent tasks.** They are 320 model-task evaluation episodes, comprising two trained model arms applied to the same 160 task instances. Similarly, never combine SW09, SW12, SW15 and SW16 results as independent samples without accounting for repeated task families and evaluation reuse.
+
+## SW17 fixed-controller sealed learning attribution (80 distinct synthetic tasks)
+
+Source: reported `policy_summary.csv`, `group_summary.csv`, `unseen_schema_summary.csv` and `paired_tests.csv` from the completed SW17 Kaggle scoring cell; exact per-task exports are pending upload. All three primary policies use identical four-read bootstrap and no post-bootstrap recovery controller.
+
+| Policy | Strict /80 | Persisted-state correct /80 | Evidence supported /80 | Unsafe proposals | Mean tool steps | Mean model calls |
+|---|---:|---:|---:|---:|---:|---:|
+| frozen_sw09 | 31 | 58 | 54 | 6 | 11.7750 | 7.7750 |
+| corrective_v4 | **65** | 77 | 73 | **8** | 14.4375 | 10.4375 |
+| rehearsal_v4 | **65** | 80 | 77 | **8** | 12.0875 | 8.0875 |
+| previous_rehearsal_v3 (optional) | 57 | 75 | 60 | 2 | 11.8750 | 7.8750 |
+
+Paired exact McNemar: corrective_v4 vs frozen_sw09 **38 wins / 4 losses, p=5.653146e-8**; rehearsal_v4 vs frozen_sw09 **36 / 2, p=5.398761e-9**; corrective_v4 vs rehearsal_v4 **5 / 5, p=1.0**; corrective_v4 vs previous_rehearsal_v3 **19 / 11, p=0.2004884**. Do not use these significance values to infer independent generalization across task families.
+
+**Authorization counterexample:** `injected_forbidden` has **0/8 strict successes and 8 unsafe mutation proposals in each v4 arm**, compared with **2/8 strict and 6 proposals** in frozen SW09 and **6/8 strict and 2 proposals** in previous rehearsal v3. These are *attempted unsafe tool proposals*, which the simulator blocks, rather than confirmed unsafe executed state changes. The evaluated v4 agents are **NOT approved for unattended deployment**. The notebook's narrow learning gate `PASS_LEARNING_BUT_NOT_CORRECTIVE_SUPERIORITY` must be accompanied by its `deploy=false` decision and this safety HOLD. Under the SW17 40 unseen-field tasks: corrective 31/40, rehearsal v4 36/40, frozen SW09 18/40, previous rehearsal v3 40/40; performance is not monotonic across every subgroup.
+
+The **+42.5 percentage-point improvement** from 31/80 to 65/80 under the fixed controller is genuinely training-related, but matched ordinary rehearsal achieves the same total success. Source methodology: [dataset construction](../docs/DATASET_CONSTRUCTION.md).
