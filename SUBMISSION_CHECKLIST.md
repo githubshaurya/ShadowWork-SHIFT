@@ -26,15 +26,15 @@
 ## Required final participant action
 
 - [x] **Official submission received:** participant provided the LEXSI confirmation screen with “Submission received!” after completing the registration, abstract, artifact and Track 3 fields.
-- [x] **Confirmation captured in the conversation.** Retain the emailed confirmation and Discord contact details privately; do not publish personal identifiers in the repository.
+- [x] **Submission confirmation recorded:** retain the emailed receipt privately; no personal contact information is needed in the public repository.
 
 ## Deliberate scope choices (no blocker)
 
 - [x] **Historical SW13–SW16 evidence published:** Selected inspectable SW13 live-controller, SW14 conservative repair, SW15 cross-protocol and SW16 unified/budget scorecards, protocols and summaries are public under the [consolidated dataset's `historical/` directory](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets/tree/main/historical). The original source ZIP archives remain separately retained; historical tasks must not be pooled with the SW12/SW17 sealed cohorts.
 - **Independent external benchmark:** not required for this first-round hackathon; SW17's prespecified synthetic schema shift is disclosed precisely.
-- [x] **Hugging Face cleanup verified:** the public dataset card is byte-for-byte identical to the canonical GitHub card, with the finalized SW17 results; the empty placeholder `i-am-shaurya05/shadowwork-shift-models` no longer exists. Core model adapters, datasets, and both collections remain intact.
+- [x] **Published dataset documentation synchronized:** the current Hugging Face dataset card and methodology are present, with root hashes matching the release manifest; all primary adapters, datasets and both public collections remain listed.
 - **HF Space / video / slides:** optional for first-round submission because an accessible public GitHub repository and write-up satisfy the official public-project condition. Shortlisted teams can use these for final judging.
-- **Browser-only HF collection UI:** a separate ordinary-browser check was not available inside this assistant environment. Actual completed anonymous API publication verification **did pass** and proves the public release and collection memberships; there is no technical publication blocker.
+- **Hugging Face collection verification:** the original publication run recorded successful unauthenticated collection-membership checks; the public [release ledger](docs/PUBLIC_RELEASE_VERIFICATION.md) identifies the scope of that verification.
 - **Deployment:** the training improvement gate and production deployment gate are intentionally distinct; `deploy=false` is a safety-control result, not an incomplete artifact.
 
 **Status (16 November 2026):** first-round form submission **received**; core models, adapters, exact SW12/SW17 data, source notebooks, methodology and selected SW13–SW16 historical evidence are public. The live Hugging Face dataset `README.md` and `DATASET_METHOD.md` SHA-256 digests now match `sha256_release_manifest.json`, and the dataset methodology mirror matches GitHub. No retraining or re-submission is needed to reconcile release metadata. A fresh-environment GPU rerun was not independently performed in this audit.
