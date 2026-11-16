@@ -62,13 +62,21 @@ The checks above are **code-level controls**, not proof that the scripted teache
 
 **Do not confuse:** 800 rows with 800 independent tasks; successful scripted reference rollout with independent ground-truth certification; simulator read-back with a real production database; or multiple model-task evaluations with that many distinct benchmark tasks.
 
-## 6. Licenses, suitability and limitations
+## 6. Evaluation outcome and failure transparency (SW17)
+
+On the **80-case precommitted SW17 sealed suite**, original frozen corrective achieved **31/80** strict success, learner-state corrective v4 **65/80**, equal-budget rehearsal v4 **65/80**, and an additional older rehearsal v3 **57/80**. Corrective versus frozen had **38 paired wins and 4 losses** (exact McNemar `p=5.653146e-8`); corrective versus rehearsal v4 had **5 wins and 5 losses** (`p=1.0`). Thus the clear result is learned adaptation, not superiority of this particular corrective curriculum.
+
+The **eight `injected_forbidden` scenarios are a decisive failure category**: corrective v4 and rehearsal v4 both generated unsafe mutation proposals on all eight cases and scored zero strict successes. The synthetic runtime **blocked** those proposals; they are not evidence of executed forbidden writes. The original frozen model attempted six unsafe proposals, while a previous rehearsal v3 policy attempted two. Therefore **the learner improvements must not be interpreted as improving authorization safety**, and the deployment recommendation remains **HOLD**. These counterexamples are retained in the public task IDs and scored episode traces rather than excluded or silently repaired.
+
+Publication must include the complete `policy_summary.csv`, `group_summary.csv`, `unseen_schema_summary.csv`, `paired_tests.csv`, `learning_gate.json`, both arm training hashes, and all available SW17 sealed episode traces so others can independently verify the result and its negative safety finding.
+
+## 7. Licenses, suitability and limitations
 
 The scenarios are synthetic, not derived from identifiable human subjects or confidential production logs. The public datasets are intended for controlled research/demos on stateful tool-use, failure detection and recovery. They do not contain evidence of safe performance on real business infrastructure and should not be used as a standalone safety certification for tool agents. The creator's chosen bundle license is **CC BY-NC 4.0**, and users must additionally observe applicable model and software licenses. Synthetic status does not eliminate the possibility of methodological bias.
 
 **Main limitations:** only two closely related simulator families; hand-scripted fault distributions and reference policy; limited independently authored adversarial conditions; no external human labeling or adjudication; limited held-out tasks per group; possible lexical correlations; repeated test-family iteration across notebooks; protocol assumptions embedded in the synthetic environment.
 
-## 7. Reproduce and audit
+## 8. Reproduce and audit
 
 Source notebooks:
 - [SW12 closed-loop dataset/training/evaluation](../notebooks/SW12_Closed_Loop_Adaptation.ipynb), especially the task generator and matched-data construction cells.
@@ -81,6 +89,6 @@ Public dataset locations:
 
 The second link is a **publication target** until its files are actually uploaded and verified. The GitHub source documents this workflow, but doesn't by itself constitute a Hugging Face dataset release.
 
-## 8. Documentation conventions
+## 9. Documentation conventions
 
 This dataset is documented using the motivation, composition, collection process, preprocessing, intended use and limitation structure advocated by **Gebru et al., _Datasheets for Datasets_ (2021)** and Hugging Face's official [dataset card guidance](https://huggingface.co/docs/hub/datasets-cards). This is a documentation framework, **not** an endorsement or independent validation of our dataset by those authors.
