@@ -1,4 +1,6 @@
-# SW17 second-arm recovery: runbook
+# SW17 second-arm recovery: historical troubleshooting runbook
+
+**Status (16 November 2026): resolved.** Both SW17 v4 adapters completed training and the fixed-controller sealed evaluation was published. The steps below document an earlier interrupted Kaggle training session and its recovery procedure; they are **not outstanding work**. For final results, see [the SW17 result report](../docs/SW17_RESULTS.md) and [public scored evidence](https://huggingface.co/datasets/i-am-shaurya05/shadowwork-shift-datasets/tree/main/sw17).
 
 **Evidence already observed (16 November 2026).**
 
